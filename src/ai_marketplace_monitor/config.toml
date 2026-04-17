@@ -352,3 +352,38 @@ locale = "Swedish"
 "About this vehicle" = "Om detta fordon"
 "Seller's description" = "Säljarens beskrivning"
 "Browse Marketplace" = 'Bläddra på Marketplace'
+
+
+#
+# Toronto-focused presets
+#
+[region.toronto]
+full_name = "Toronto"
+radius = 10
+city_name = ["Toronto, ON"]
+search_city = ["toronto"]
+currency = 'CAD'
+
+[marketplace.facebook]
+search_region = 'toronto'
+
+[item.gpu16_pc]
+search_phrases = [
+    'gaming laptop',
+    'gaming desktop',
+    'workstation pc',
+]
+keywords = '(laptop OR notebook OR desktop OR pc OR computer) AND ("16gb vram" OR "16 gb vram" OR "rtx 4080" OR "rtx 4090" OR "rtx 4070 ti super" OR "rx 6800" OR "rx 7800 xt" OR "rx 7900 xt" OR "rx 7900 xtx")'
+min_price = 100
+max_price = 1600
+
+[item.mac_32gb_ram]
+search_phrases = [
+    'macbook pro',
+    'mac studio',
+    'mac mini',
+    'imac',
+]
+keywords = '(mac OR macbook OR imac OR "mac mini" OR "mac studio") AND ("32gb" OR "32 gb" OR "36gb" OR "36 gb" OR "48gb" OR "48 gb" OR "64gb" OR "64 gb" OR "96gb" OR "96 gb" OR "128gb" OR "128 gb")'
+min_price = 100
+max_price = 1600
