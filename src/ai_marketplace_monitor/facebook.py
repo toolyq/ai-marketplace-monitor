@@ -516,7 +516,7 @@ class FacebookMarketplace(Marketplace):
                     self.page, self.translator, self.logger
                 ).get_listings()
                 time.sleep(5)
-                if self.logger:
+                if self.logger and not found_listings:
                     self.logger.error(
                         f"""{hilight("[Search]", "fail")} Failed to get search results for {search_phrase} from {city}"""
                     )
@@ -808,7 +808,8 @@ class FacebookSearchResultPage(WebPage):
                 details_divs = atag.query_selector_all(":scope > :first-child > div")
                 if not details_divs:
                     continue
-                details = details_divs[1]
+                # Marketplace card layouts vary; some cards expose only one details container.
+                details = details_divs[1] if len(details_divs) > 1 else details_divs[0]
                 divs = details.query_selector_all(":scope > div")
                 raw_price = "" if len(divs) < 1 else divs[0].text_content() or ""
                 title = "" if len(divs) < 2 else divs[1].text_content() or ""
