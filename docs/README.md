@@ -344,6 +344,8 @@ The optional `monitor` section allows you to define system configurations for th
 
 | Option           | Requirement | DataType    | Description                              |
 | ---------------- | ----------- | ----------- | ---------------------------------------- |
+| `cdp_url`        | Required    | String      | CDP endpoint URL for an existing Chromium browser. |
+| `cdp_timeout`    | Optional    | Integer     | CDP connection timeout in milliseconds.  |
 | `proxy_server`   | Optional    | String/List | URL for one or more proxy servers.       |
 | `proxy_bypass`   | Optional    | String      | Comma-separated domains to bypass proxy. |
 | `proxy_username` | Optional    | String      | username for the proxy.                  |

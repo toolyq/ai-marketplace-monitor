@@ -175,6 +175,17 @@ proxy_username = 'adfa'
 proxy_password = 'fadfadf'
 """
 
+cdp_monitor_cfg = """
+[monitor]
+cdp_url = 'http://127.0.0.1:9222'
+cdp_timeout = 30000
+"""
+
+invalid_cdp_monitor_cfg = """
+[monitor]
+cdp_url = '127.0.0.1:9222'
+"""
+
 licensed_monitor_cfg = """
 [monitor]
 proxy_server = 'https://fdaf.fadfd.com'
@@ -249,6 +260,11 @@ proxy_password = 'fadfadf'
         (base_marketplace_cfg + base_item_cfg + "\na=1\n" + base_user_cfg, False),
         (base_marketplace_cfg + base_item_cfg + base_user_cfg + "\na=1\n", False),
         (base_marketplace_cfg + base_item_cfg + base_user_cfg + monitor_cfg, True),
+        (base_marketplace_cfg + base_item_cfg + base_user_cfg + cdp_monitor_cfg, True),
+        (
+            base_marketplace_cfg + base_item_cfg + base_user_cfg + invalid_cdp_monitor_cfg,
+            False,
+        ),
         (base_marketplace_cfg + base_item_cfg + base_user_cfg + licensed_monitor_cfg, True),
     ],
 )

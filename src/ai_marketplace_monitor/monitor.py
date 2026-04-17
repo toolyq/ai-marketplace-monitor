@@ -93,34 +93,43 @@ class MarketplaceMonitor:
                 continue
 
     def _launch_browser(self: "MarketplaceMonitor") -> Browser:
-        """Launch a browser, preferring Chromium if available, otherwise any installed browser."""
-        # Try browsers in order of preference
-        browser_types = [
-            ("chromium", self.playwright.chromium),
-            ("firefox", self.playwright.firefox),
-            ("webkit", self.playwright.webkit),
-        ]
+        """Launch a browser.
 
-        for browser_name, browser_type in browser_types:
-            try:
-                if self.logger:
-                    self.logger.debug(f"Attempting to launch {browser_name} browser...")
-                browser = browser_type.launch(headless=self.headless)
-                if self.logger:
-                    self.logger.info(
-                        f"""{hilight("[Browser]", "info")} Successfully launched {browser_name} browser.""",
-                        extra=aimm_event("browser_ready", engine=browser_name),
-                    )
-                return browser
-            except Exception as e:
-                if self.logger:
-                    self.logger.debug(f"Failed to launch {browser_name}: {e}")
-                continue
+        Strict CDP mode: connect to an existing Chromium instance over CDP.
+        No fallback to launching local Playwright browsers.
+        """
+        assert self.config is not None
+        cdp_url = self.config.monitor.cdp_url
+        if not cdp_url:
+            raise RuntimeError(
+                "Strict CDP mode requires monitor.cdp_url in config. "
+                "Example: cdp_url = 'http://127.0.0.1:9222'"
+            )
 
-        # If all fail, raise an error
-        raise RuntimeError(
-            "No browser could be launched. Please ensure Chromium, Firefox, or WebKit is installed."
-        )
+        try:
+            kwargs = {}
+            if self.config.monitor.cdp_timeout is not None:
+                kwargs["timeout"] = self.config.monitor.cdp_timeout
+            if self.logger:
+                self.logger.info(
+                    f"""{hilight("[Browser]", "info")} Connecting to Chromium over CDP: {hilight(cdp_url)}""",
+                    extra=aimm_event("browser_connect", mode="cdp", endpoint=cdp_url),
+                )
+            browser = self.playwright.chromium.connect_over_cdp(cdp_url, **kwargs)
+            if self.logger:
+                self.logger.info(
+                    f"""{hilight("[Browser]", "succ")} Connected to Chromium via CDP.""",
+                    extra=aimm_event(
+                        "browser_ready", engine="chromium", mode="cdp", endpoint=cdp_url
+                    ),
+                )
+            return browser
+        except Exception as e:
+            raise RuntimeError(
+                "Failed to connect to Chromium via CDP. "
+                "Start Chrome/Chromium with --remote-debugging-port and verify monitor.cdp_url. "
+                f"Endpoint: {cdp_url}. Error: {e}"
+            ) from e
 
     def load_ai_agents(self: "MarketplaceMonitor") -> None:
         """Load the AI agent."""

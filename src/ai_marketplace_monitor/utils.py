@@ -322,10 +322,41 @@ class BaseConfig:
 
 @dataclass
 class MonitorConfig(BaseConfig):
+    cdp_url: str | None = None
+    cdp_timeout: int | None = None
     proxy_server: List[str] | None = None
     proxy_bypass: str | None = None
     proxy_username: str | None = None
     proxy_password: str | None = None
+
+    def handle_cdp_url(self: "MonitorConfig") -> None:
+        if self.cdp_url is None:
+            return
+        if not isinstance(self.cdp_url, str):
+            raise ValueError(f"Item {hilight(self.name)} cdp_url must be a string.")
+        if not (
+            self.cdp_url.startswith("http://")
+            or self.cdp_url.startswith("https://")
+            or self.cdp_url.startswith("ws://")
+            or self.cdp_url.startswith("wss://")
+        ):
+            raise ValueError(
+                f"Item {hilight(self.name)} cdp_url must start with http://, https://, ws://, or wss://"
+            )
+
+    def handle_cdp_timeout(self: "MonitorConfig") -> None:
+        if self.cdp_timeout is None:
+            return
+        if isinstance(self.cdp_timeout, str):
+            if not self.cdp_timeout.isdigit():
+                raise ValueError(
+                    f"Item {hilight(self.name)} cdp_timeout must be an integer number of milliseconds."
+                )
+            self.cdp_timeout = int(self.cdp_timeout)
+        if not isinstance(self.cdp_timeout, int) or self.cdp_timeout < 0:
+            raise ValueError(
+                f"Item {hilight(self.name)} cdp_timeout must be a non-negative number."
+            )
 
     def handle_proxy_server(self: "MonitorConfig") -> None:
         if self.proxy_server is None:

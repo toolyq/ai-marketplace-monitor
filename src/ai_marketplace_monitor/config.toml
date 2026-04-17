@@ -1,4 +1,12 @@
 #
+# Monitor settings.
+# In strict CDP mode, cdp_url is required.
+#
+[monitor]
+cdp_url = "http://127.0.0.1:9222"
+cdp_timeout = 30000
+
+#
 # Region definitions.
 # - full_name and city_name are for readability/booktracking purpose only
 # - different radius can be used for different search_city. In this case

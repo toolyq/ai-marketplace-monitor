@@ -513,13 +513,18 @@ class Marketplace(Generic[TMarketplaceConfig, TItemConfig]):
             self.page = None
 
         if self.page is None:
-            context = self.browser.new_context(
-                proxy=(
-                    None
-                    if self.config.monitor_config is None
-                    else self.config.monitor_config.get_proxy_options()
-                )
+            proxy_options = (
+                None
+                if self.config.monitor_config is None
+                else self.config.monitor_config.get_proxy_options()
             )
+
+            # CDP-attached browsers often provide pre-existing contexts.
+            # Reuse them by default for compatibility.
+            if self.browser.contexts and proxy_options is None:
+                context = self.browser.contexts[0]
+            else:
+                context = self.browser.new_context(proxy=proxy_options)
             self.page = context.new_page()
         return self.page
 

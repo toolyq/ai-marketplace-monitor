@@ -490,6 +490,26 @@ If you would like to use a proxy server, you can:
 
 Replace `${PROXY_SERVER}`, `${PROXY_USERNAME}`, and `${PROXY_PASSWORD}` with your proxy service details, or setting the corresponding environment variables.
 
+CDP Browser Connection
+----------------------
+
+*AI Marketplace Monitor* now runs in strict CDP mode. You must run Chrome/Chromium yourself and let it connect via CDP (Chrome DevTools Protocol):
+
+.. code-block:: toml
+
+    [monitor]
+    cdp_url = "http://127.0.0.1:9222"
+    cdp_timeout = 30000
+
+- ``cdp_url`` supports ``http(s)://`` and ``ws(s)://`` endpoints.
+- ``cdp_timeout`` is optional and uses milliseconds.
+
+Example launch command:
+
+.. code-block:: bash
+
+    chrome --remote-debugging-port=9222
+
 
 
 Multiple Marketplaces

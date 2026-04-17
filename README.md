@@ -116,6 +116,9 @@ max_price = 300
 
 [user.me]
 pushbullet_token = 'your_token_here'  # Get from pushbullet.com
+
+[monitor]
+cdp_url = 'http://127.0.0.1:9222'  # Required in strict CDP mode
 ```
 
 ### Run the Monitor
