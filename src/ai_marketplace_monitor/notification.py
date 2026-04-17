@@ -91,6 +91,19 @@ class NotificationConfig(BaseConfig):
                 succ.append(subclass.notify_all(config, *args, **kwargs))
         return any(succ)
 
+    @staticmethod
+    def empty_search_result_message(
+        item_name: str | None, marketplace_name: str | None
+    ) -> tuple[str, str]:
+        item_label = item_name or "listing"
+        marketplace_label = marketplace_name or "marketplace"
+        title = f"No new listings found for {item_label} on {marketplace_label}"
+        message = (
+            f"No new listings were found for {item_label} on {marketplace_label} "
+            "in the latest search."
+        )
+        return title, message
+
     def _execute_with_retry(
         self: "NotificationConfig",
         title: str,
@@ -314,6 +327,9 @@ class PushNotificationConfig(NotificationConfig):
         notification_status: List[NotificationStatus],
         force: bool = False,
         logger: Logger | None = None,
+        item_name: str | None = None,
+        marketplace_name: str | None = None,
+        send_empty: bool = False,
     ) -> bool:
         if not self._has_required_fields():
             if logger:
@@ -321,6 +337,9 @@ class PushNotificationConfig(NotificationConfig):
                     f"Missing required fields  {', '.join(self.required_fields)}. No {self.notify_method} notification sent."
                 )
             return False
+        if send_empty and not listings:
+            title, message = self.empty_search_result_message(item_name, marketplace_name)
+            return self.send_message_with_retry(title, message, logger=logger)
         #
         # we send listings with different status with different messages
         msgs: DefaultDict[NotificationStatus, List[Tuple[Listing, str]]] = defaultdict(list)

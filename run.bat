@@ -53,4 +53,6 @@ if not "%EXIT_CODE%"=="0" (
 	pause
 )
 
-endlocal & exit /b %EXIT_CODE%
+::endlocal & exit /b %EXIT_CODE%
+
+cmd /k

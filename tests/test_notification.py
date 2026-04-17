@@ -62,6 +62,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from ai_marketplace_monitor.email_notify import EmailNotificationConfig
+from ai_marketplace_monitor.ntfy import NtfyNotificationConfig
 from ai_marketplace_monitor.notification import NotificationConfig
 from ai_marketplace_monitor.telegram import TelegramNotificationConfig
 
@@ -338,3 +340,54 @@ class TestNotificationConfigRateLimiting:
             with patch.object(config, "_has_required_fields", return_value=True):
                 result = config.send_message_with_retry("title", "message")
                 assert result is True
+
+
+def test_push_notification_sends_empty_search_summary() -> None:
+    config = NtfyNotificationConfig(
+        name="test_ntfy",
+        ntfy_server="https://ntfy.example.com",
+        ntfy_topic="updates",
+    )
+
+    with patch.object(config, "send_message_with_retry", return_value=True) as send_mock:
+        result = config.notify(
+            [],
+            [],
+            [],
+            item_name="bike",
+            marketplace_name="facebook",
+            send_empty=True,
+        )
+
+    assert result is True
+    send_mock.assert_called_once_with(
+        "No new listings found for bike on facebook",
+        "No new listings were found for bike on facebook in the latest search.",
+        logger=None,
+    )
+
+
+def test_email_notification_sends_empty_search_summary() -> None:
+    config = EmailNotificationConfig(
+        name="test_email",
+        email=["user@example.com"],
+        smtp_password="secret",
+    )
+
+    with patch.object(config, "send_email_message", return_value=True) as send_mock:
+        result = config.notify(
+            [],
+            [],
+            [],
+            item_name="bike",
+            marketplace_name="facebook",
+            send_empty=True,
+        )
+
+    assert result is True
+    send_mock.assert_called_once()
+    args = send_mock.call_args.args
+    assert args[0] == "No new listings found for bike on facebook"
+    assert args[1] == "No new listings were found for bike on facebook in the latest search."
+    assert "No new listings were found for bike on facebook in the latest search." in args[2]
+    assert args[3] == []

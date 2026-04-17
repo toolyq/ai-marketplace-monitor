@@ -232,6 +232,9 @@ class EmailNotificationConfig(NotificationConfig):
         notification_status: List[NotificationStatus],
         force: bool = False,
         logger: Logger | None = None,
+        item_name: str | None = None,
+        marketplace_name: str | None = None,
+        send_empty: bool = False,
     ) -> bool:
         if not self._has_required_fields():
             if logger:
@@ -239,6 +242,11 @@ class EmailNotificationConfig(NotificationConfig):
                     f"Missing required fields {', '.join(self.required_fields)}. No {self.notify_method} notification sent."
                 )
             return False
+
+        if send_empty and not listings:
+            title, message = self.empty_search_result_message(item_name, marketplace_name)
+            html_message = f"<html><body><p>{escape(message)}</p></body></html>"
+            return self.send_email_message(title, message, html_message, [], logger=logger)
 
         title = self.get_title(listings, notification_status, force=force)
         if not title:

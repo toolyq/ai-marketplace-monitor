@@ -282,10 +282,14 @@ class MarketplaceMonitor:
             counter.increment(
                 CounterItem.NEW_VALIDATED_LISTING, item_config.name, len(new_listings)
             )
-            for user in users_to_notify:
-                User(self.config.user[user], logger=self.logger).notify(
-                    new_listings, listing_ratings, item_config
-                )
+        for user in users_to_notify:
+            User(self.config.user[user], logger=self.logger).notify(
+                new_listings,
+                listing_ratings,
+                item_config,
+                marketplace_name=marketplace_config.name,
+                send_empty=not new_listings,
+            )
         time.sleep(5)
 
     def _select_translator(

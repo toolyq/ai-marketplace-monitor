@@ -1,12 +1,15 @@
 """Tests for `ai_marketplace_monitor` module."""
 
 import time
+from types import SimpleNamespace
+from unittest.mock import MagicMock
 
 from diskcache import Cache  # type: ignore
 
 from ai_marketplace_monitor.ai import AIResponse  # type: ignore
 from ai_marketplace_monitor.facebook import FacebookItemConfig
 from ai_marketplace_monitor.listing import Listing
+from ai_marketplace_monitor.monitor import MarketplaceMonitor
 from ai_marketplace_monitor.notification import NotificationStatus
 from ai_marketplace_monitor.user import User
 
@@ -67,3 +70,51 @@ def test_notify_all(
     user: User, item_config: FacebookItemConfig, listing: Listing, ai_response: AIResponse
 ) -> None:
     user.notify([listing], [ai_response], item_config)
+
+
+def test_search_item_notifies_even_when_no_results(
+    item_config: FacebookItemConfig, marketplace_config, user_config, monkeypatch
+) -> None:
+    monitor = MarketplaceMonitor.__new__(MarketplaceMonitor)
+    monitor.config = SimpleNamespace(user={"user1": user_config})
+    monitor.logger = None
+
+    marketplace = MagicMock()
+    marketplace.search.return_value = iter(())
+
+    notify_calls = []
+
+    def fake_notify(
+        self,
+        listings,
+        ratings,
+        item_cfg,
+        local_cache=None,
+        force=False,
+        marketplace_name=None,
+        send_empty=False,
+    ) -> None:
+        notify_calls.append(
+            {
+                "listings": listings,
+                "ratings": ratings,
+                "item_name": item_cfg.name,
+                "marketplace_name": marketplace_name,
+                "send_empty": send_empty,
+            }
+        )
+
+    monkeypatch.setattr(User, "notify", fake_notify)
+    monkeypatch.setattr("ai_marketplace_monitor.monitor.time.sleep", lambda _: None)
+
+    monitor.search_item(marketplace_config, marketplace, item_config)
+
+    assert notify_calls == [
+        {
+            "listings": [],
+            "ratings": [],
+            "item_name": item_config.name,
+            "marketplace_name": marketplace_config.name,
+            "send_empty": True,
+        }
+    ]

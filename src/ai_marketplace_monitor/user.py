@@ -176,6 +176,8 @@ class User:
         item_config: TItemConfig,
         local_cache: Cache | None = None,
         force: bool = False,
+        marketplace_name: str | None = None,
+        send_empty: bool = False,
     ) -> None:
         if self.config.enabled is False:
             if self.logger:
@@ -186,7 +188,15 @@ class User:
         statuses = [self.notification_status(listing, local_cache) for listing in listings]
 
         if NotificationConfig.notify_all(
-            self.config, listings, ratings, statuses, force=force, logger=self.logger
+            self.config,
+            listings,
+            ratings,
+            statuses,
+            force=force,
+            logger=self.logger,
+            item_name=item_config.name,
+            marketplace_name=marketplace_name,
+            send_empty=send_empty,
         ):
             counter.increment(CounterItem.NOTIFICATIONS_SENT, item_config.name)
             for listing, ns in zip(listings, statuses):
