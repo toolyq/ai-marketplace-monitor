@@ -42,13 +42,12 @@ class MarketplaceMonitor:
         headless: bool | None,
         logger: Logger | None,
     ) -> None:
-        for file_path in config_files or []:
-            if not file_path.exists():
-                raise FileNotFoundError(f"Config file {file_path} not found.")
-        default_config = amm_home / "config.toml"
-        self.config_files = ([default_config] if default_config.exists() else []) + (
-            [x.expanduser().resolve() for x in config_files or []]
-        )
+        package_config = (Path(__file__).parent / "config.toml").resolve()
+        if not package_config.exists():
+            raise FileNotFoundError(f"Config file {package_config} not found.")
+        # Strict config source: only use the package config file.
+        # Ignore user-home and CLI-provided config files.
+        self.config_files = [package_config]
         #
         self.config: Config | None = None
         self.config_hash: str | None = None
@@ -509,7 +508,7 @@ class MarketplaceMonitor:
             )
 
     def start_monitor(self: "MarketplaceMonitor") -> None:
-        """Main function to monitor the marketplace."""
+        """Run all configured search tasks once, then exit."""
         # start a browser with playwright, cannot use with statement since the jobs will be
         # executed outside of the scope by schedule job runner
         self.keyboard_monitor = KeyboardMonitor()
@@ -526,91 +525,21 @@ class MarketplaceMonitor:
         if self.defer_login_until_credentials:
             self._wait_for_marketplace_credentials()
         self.browser = self._launch_browser()
-        #
         assert self.browser is not None
-        while True:
+        self.handle_pause()
+        self.schedule_jobs()
+        if not schedule.get_jobs():
+            raise RuntimeError("No search job is defined. Please add search items to your config file.")
+
+        for job in schedule.get_jobs():
+            job.run()
             self.handle_pause()
-            self.schedule_jobs()
-            if not schedule.get_jobs():
-                # this actually should not happen because at least one item is required for the configuration file
-                if self.logger:
-                    self.logger.error(
-                        "No search job is defined. Please add search items to your config file."
-                    )
-                self.handle_pause()
-                if doze(60, self.config_files, self.keyboard_monitor) == SleepStatus.BY_KEYBOARD:
-                    self.keyboard_monitor.set_paused(True)
-                continue
-            # run all jobs at the first time, then on their own schedule
-            # we could have used schedule.run_all() but we would like to check if
-            # configuration file has been changed, if so, clear all jobs and restart
-            for job in schedule.get_jobs():
-                job.run()
-                self.handle_pause()
-                # if configuration file has been changed, clear all scheduled jobs and restart
-                new_file_hash = calculate_file_hash(self.config_files)
-                assert self.config_hash is not None
-                if new_file_hash != self.config_hash:
-                    if self.logger:
-                        self.logger.info(
-                            f"""{hilight("[Config]", "info")} Config file changed, restarting monitor."""
-                        )
-                    schedule.clear()
-                    break
-            if not schedule.get_jobs():
-                continue
-            # subsequent runs will be scheduled runs
-            while True:
-                next_job: schedule.Job | None = None
-                for job in schedule.jobs:
-                    if job.next_run is None:
-                        continue
-                    if next_job is None or (
-                        next_job.next_run and next_job.next_run > job.next_run
-                    ):
-                        next_job = job
 
-                if next_job is None:
-                    # no more job
-                    if self.logger:
-                        self.logger.warning(
-                            f"""{hilight("[Schedule]", "fail")} No more active search job."""
-                        )
-                    sys.exit(0)
-                # assert next_job is not None
-                assert next_job.next_run is not None
-                idle_seconds = schedule.idle_seconds() or 0
-                if idle_seconds > 60:
-                    # the sleep time might not be enough, causing this message
-                    # to be sent repeatedly. Having a idle_seconds > 60 helps
-                    # to reduce the frequency of this message.
-                    if self.logger:
-                        self.logger.info(
-                            f"""{hilight("[Schedule]", "info")} Next job to search {hilight(str(next(iter(next_job.tags))))} scheduled to run in {humanize.naturaldelta(idle_seconds)} at {next_job.next_run.strftime("%Y-%m-%d %H:%M:%S")}"""
-                        )
-
-                # sleep at most 1 hr, and print updated "next job" message
-                res = doze(
-                    min(max(5, int(idle_seconds)), 60 * 60),
-                    self.config_files,
-                    self.keyboard_monitor,
-                )
-                if res == SleepStatus.BY_FILE_CHANGE:
-                    # if configuration file has been changed, clear all scheduled jobs and restart
-                    new_file_hash = calculate_file_hash(self.config_files)
-                    assert self.config_hash is not None
-                    if new_file_hash != self.config_hash:
-                        if self.logger:
-                            self.logger.info(
-                                f"""{hilight("[Config]", "info")} Config file changed, restarting monitor."""
-                            )
-                        schedule.clear()
-                        break
-                elif res == SleepStatus.BY_KEYBOARD:
-                    self.keyboard_monitor.set_paused(True)
-
-                self.handle_pause()
-                schedule.run_pending()
+        if self.logger:
+            self.logger.info(f"""{hilight("[Schedule]", "succ")} All search tasks completed. Exiting.""")
+        schedule.clear()
+        self.stop_monitor()
+        sys.exit(0)
 
     def stop_monitor(self: "MarketplaceMonitor") -> None:
         """Stop the monitor."""

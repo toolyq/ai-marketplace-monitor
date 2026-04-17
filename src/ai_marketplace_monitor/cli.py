@@ -107,7 +107,7 @@ def main(
         typer.Option(
             "-r",
             "--config",
-            help="Path to one or more configuration files in TOML format. `~/.ai-marketplace-monitor/config.toml will always be read.",
+            help="Ignored in strict mode. The monitor reads only src/ai_marketplace_monitor/config.toml.",
         ),
     ] = None,
     headless: Annotated[
@@ -244,12 +244,6 @@ def main(
     monitor = None  # type: ignore[assignment]
     webui_server = None
     try:
-        # If web UI is on and there are no existing config files, seed
-        # the default ~/.ai-marketplace-monitor/config.toml with a
-        # template so the user can edit it from the browser on first run.
-        if webui and not config_files and not (amm_home / "config.toml").exists():
-            _seed_default_config(amm_home / "config.toml", logger)
-
         monitor = MarketplaceMonitor(config_files, headless, logger)
         if webui and log_broadcast_handler is not None:
             from .webui.server import WebUIConfig, start_webui

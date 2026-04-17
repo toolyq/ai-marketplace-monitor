@@ -255,7 +255,8 @@ class FacebookItemConfig(ItemConfig, FacebookMarketItemCommonConfig):
 
 
 class FacebookMarketplace(Marketplace):
-    initial_url = "https://www.facebook.com/login/device-based/regular/login/"
+    home_url = "https://www.facebook.com/"
+    initial_url = "https://www.facebook.com/login/"
 
     name = "facebook"
 
@@ -278,14 +279,8 @@ class FacebookMarketplace(Marketplace):
     def get_item_config(cls: Type["FacebookMarketplace"], **kwargs: Any) -> FacebookItemConfig:
         return FacebookItemConfig(**kwargs)
 
-    def login(self: "FacebookMarketplace") -> None:
-        assert self.browser is not None
-
-        self.page = self.create_page(swap_proxy=True)
-
-        # Navigate to the URL, no timeout
-        self.goto_url(self.initial_url)
-
+    def _handle_cookie_popup(self: "FacebookMarketplace") -> None:
+        assert self.page is not None
         if self.logger:
             self.logger.debug("[Login] Checking for cookie consent pop-up...")
         try:
@@ -296,7 +291,7 @@ class FacebookMarketplace(Marketplace):
 
             if allow_button_locator.is_visible():
                 allow_button_locator.click()
-                self.page.wait_for_timeout(2000)  # 2 seconds
+                self.page.wait_for_timeout(2000)
                 if self.logger:
                     self.logger.debug(
                         f"""{hilight("[Login]", "succ")} Allow all cookies' button clicked."""
@@ -310,6 +305,40 @@ class FacebookMarketplace(Marketplace):
                 self.logger.warning(
                     f"{hilight('[Login]', 'fail')} Could not handle cookie pop-up (or it was not present): {e!s}"
                 )
+
+    def _is_logged_in(self: "FacebookMarketplace") -> bool:
+        assert self.page is not None
+        current_url = self.page.url.lower()
+        if "/login" in current_url:
+            return False
+        return self.page.locator('input[name="email"], input[name="pass"], button[name="login"]').count() == 0
+
+    def login(self: "FacebookMarketplace") -> None:
+        assert self.browser is not None
+
+        self.page = self.create_page(swap_proxy=True)
+
+        # Open the Facebook homepage first so an existing logged-in CDP session
+        # can be reused without forcing a redirect to the login form.
+        self.goto_url(self.home_url)
+        self._handle_cookie_popup()
+
+        if self._is_logged_in():
+            if self.logger:
+                self.logger.info(
+                    f"""{hilight("[Login]", "succ")} Facebook session already logged in."""
+                )
+            return
+
+        self.goto_url(self.initial_url)
+        self._handle_cookie_popup()
+
+        if "/login" not in self.page.url.lower() and not self.page.locator(
+            'input[name="email"], input[name="pass"], button[name="login"]'
+        ).count():
+            raise RuntimeError(
+                f"Facebook login page did not load correctly. Current URL: {self.page.url}"
+            )
 
         self.config: FacebookMarketplaceConfig
         try:
@@ -650,6 +679,39 @@ class FacebookMarketplace(Marketplace):
 
 
 class FacebookSearchResultPage(WebPage):
+    max_listings = 13
+
+    def _count_listing_elements(self: "FacebookSearchResultPage") -> int:
+        return len(
+            self._get_listing_elements_by_traversing_header()
+            or self._get_listings_elements_by_children_counts()
+        )
+
+    def _load_more_results(
+        self: "FacebookSearchResultPage",
+        max_scrolls: int = 20,
+        stable_rounds: int = 3,
+        pause_ms: int = 1500,
+    ) -> None:
+        stable_count = 0
+        previous_count = 0
+
+        for _ in range(max_scrolls):
+            current_count = self._count_listing_elements()
+            if current_count >= self.max_listings:
+                break
+            if current_count <= previous_count:
+                stable_count += 1
+            else:
+                stable_count = 0
+                previous_count = current_count
+
+            if stable_count >= stable_rounds:
+                break
+
+            self.page.mouse.wheel(0, 12000)
+            self.page.wait_for_timeout(pause_ms)
+
     def _get_listings_elements_by_children_counts(self: "FacebookSearchResultPage"):
         parent: ElementHandle | None = self.page.locator("img").first.element_handle()
         # look for parent of parent until it has more than 10 children
@@ -713,12 +775,15 @@ class FacebookSearchResultPage(WebPage):
                 self.logger.info(f"{hilight('[Retrieve]', 'dim')} {msg}")
             return []
 
+        self._load_more_results()
+
         # find the grid box
         try:
             valid_listings = (
                 self._get_listing_elements_by_traversing_header()
                 or self._get_listings_elements_by_children_counts()
             )
+            valid_listings = valid_listings[: self.max_listings]
         except KeyboardInterrupt:
             raise
         except Exception as e:

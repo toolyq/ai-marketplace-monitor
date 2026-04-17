@@ -1,4 +1,4 @@
-#
+﻿#
 # Monitor settings.
 # In strict CDP mode, cdp_url is required.
 #
@@ -384,6 +384,18 @@ search_phrases = [
     'mac mini',
     'imac',
 ]
-keywords = '(mac OR macbook OR imac OR "mac mini" OR "mac studio") AND ("32gb" OR "32 gb" OR "36gb" OR "36 gb" OR "48gb" OR "48 gb" OR "64gb" OR "64 gb" OR "96gb" OR "96 gb" OR "128gb" OR "128 gb")'
+keywords = '(mac OR macbook OR imac OR "mac mini" OR "mac studio") AND ("apple silicon" OR m1 OR m1pro OR "m1 pro" OR m1max OR "m1 max" OR m1ultra OR "m1 ultra" OR m2 OR m2pro OR "m2 pro" OR m2max OR "m2 max" OR m2ultra OR "m2 ultra" OR m3 OR m3pro OR "m3 pro" OR m3max OR "m3 max" OR m4 OR m4pro OR "m4 pro" OR m4max OR "m4 max") AND ("unified memory" OR "shared memory" OR "32gb" OR "32 gb" OR "36gb" OR "36 gb" OR "48gb" OR "48 gb" OR "64gb" OR "64 gb" OR "96gb" OR "96 gb" OR "128gb" OR "128 gb")'
+antikeywords = ['intel', 'core i5', 'core i7', 'core i9']
 min_price = 100
 max_price = 1600
+
+
+#
+# Notifications
+#
+[notification.telegram]
+telegram_token = '${TELEGRAM_BOT_TOKEN}'
+telegram_chat_id = '${TELEGRAM_CHAT_ID}'
+
+[user.me]
+notify_with = 'telegram'
