@@ -191,6 +191,7 @@ class MarketplaceMonitor:
                         marketplace_name=marketplace_config.name,
                         send_summary=True,
                         summary_new_count=phrase_new_count,
+                        summary_search_phrase=listing.search_phrase,
                     )
                 phrase_new_count = 0
                 continue

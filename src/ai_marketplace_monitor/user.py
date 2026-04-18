@@ -180,6 +180,7 @@ class User:
         send_empty: bool = False,
         send_summary: bool = False,
         summary_new_count: int = 0,
+        summary_search_phrase: str | None = None,
     ) -> None:
         if self.config.enabled is False:
             if self.logger:
@@ -201,6 +202,7 @@ class User:
             send_empty=send_empty,
             send_summary=send_summary,
             summary_new_count=summary_new_count,
+            summary_search_phrase=summary_search_phrase,
         ):
             counter.increment(CounterItem.NOTIFICATIONS_SENT, item_config.name)
             for listing, ns in zip(listings, statuses):
