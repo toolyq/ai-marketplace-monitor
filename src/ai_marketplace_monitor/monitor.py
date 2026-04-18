@@ -266,6 +266,13 @@ class MarketplaceMonitor:
                 continue
             new_listings.append(listing)
             listing_ratings.append(res)
+            for user in users_to_notify:
+                User(self.config.user[user], logger=self.logger).notify(
+                    [listing],
+                    [res],
+                    item_config,
+                    marketplace_name=marketplace_config.name,
+                )
 
         p = inflect.engine()
         if self.logger:
@@ -284,11 +291,12 @@ class MarketplaceMonitor:
             )
         for user in users_to_notify:
             User(self.config.user[user], logger=self.logger).notify(
-                new_listings,
-                listing_ratings,
+                [],
+                [],
                 item_config,
                 marketplace_name=marketplace_config.name,
-                send_empty=not new_listings,
+                send_summary=True,
+                summary_new_count=len(new_listings),
             )
         time.sleep(5)
 

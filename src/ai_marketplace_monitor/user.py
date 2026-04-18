@@ -178,6 +178,8 @@ class User:
         force: bool = False,
         marketplace_name: str | None = None,
         send_empty: bool = False,
+        send_summary: bool = False,
+        summary_new_count: int = 0,
     ) -> None:
         if self.config.enabled is False:
             if self.logger:
@@ -197,6 +199,8 @@ class User:
             item_name=item_config.name,
             marketplace_name=marketplace_name,
             send_empty=send_empty,
+            send_summary=send_summary,
+            summary_new_count=summary_new_count,
         ):
             counter.increment(CounterItem.NOTIFICATIONS_SENT, item_config.name)
             for listing, ns in zip(listings, statuses):

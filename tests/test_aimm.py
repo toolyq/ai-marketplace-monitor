@@ -93,6 +93,8 @@ def test_search_item_notifies_even_when_no_results(
         force=False,
         marketplace_name=None,
         send_empty=False,
+        send_summary=False,
+        summary_new_count=0,
     ) -> None:
         notify_calls.append(
             {
@@ -101,6 +103,8 @@ def test_search_item_notifies_even_when_no_results(
                 "item_name": item_cfg.name,
                 "marketplace_name": marketplace_name,
                 "send_empty": send_empty,
+                "send_summary": send_summary,
+                "summary_new_count": summary_new_count,
             }
         )
 
@@ -115,6 +119,76 @@ def test_search_item_notifies_even_when_no_results(
             "ratings": [],
             "item_name": item_config.name,
             "marketplace_name": marketplace_config.name,
-            "send_empty": True,
+            "send_empty": False,
+            "send_summary": True,
+            "summary_new_count": 0,
         }
     ]
+
+
+def test_search_item_notifies_each_result_and_sends_completion_summary(
+    item_config: FacebookItemConfig,
+    marketplace_config,
+    user_config,
+    listing: Listing,
+    ai_response: AIResponse,
+    monkeypatch,
+) -> None:
+    monitor = MarketplaceMonitor.__new__(MarketplaceMonitor)
+    monitor.config = SimpleNamespace(user={"user1": user_config})
+    monitor.logger = None
+    monitor.evaluate_by_ai = lambda *args, **kwargs: ai_response
+
+    marketplace = MagicMock()
+    marketplace.search.return_value = iter((listing,))
+
+    notify_calls = []
+
+    def fake_notify(
+        self,
+        listings,
+        ratings,
+        item_cfg,
+        local_cache=None,
+        force=False,
+        marketplace_name=None,
+        send_empty=False,
+        send_summary=False,
+        summary_new_count=0,
+    ) -> None:
+        notify_calls.append(
+            {
+                "listings": listings,
+                "ratings": ratings,
+                "item_name": item_cfg.name,
+                "marketplace_name": marketplace_name,
+                "send_empty": send_empty,
+                "send_summary": send_summary,
+                "summary_new_count": summary_new_count,
+            }
+        )
+
+    monkeypatch.setattr(User, "notify", fake_notify)
+    monkeypatch.setattr("ai_marketplace_monitor.monitor.time.sleep", lambda _: None)
+
+    monitor.search_item(marketplace_config, marketplace, item_config)
+
+    assert len(notify_calls) == 2
+    assert notify_calls[0] == {
+        "listings": [listing],
+        "ratings": [ai_response],
+        "item_name": item_config.name,
+        "marketplace_name": marketplace_config.name,
+        "send_empty": False,
+        "send_summary": False,
+        "summary_new_count": 0,
+    }
+    assert notify_calls[1] == {
+        "listings": [],
+        "ratings": [],
+        "item_name": item_config.name,
+        "marketplace_name": marketplace_config.name,
+        "send_empty": False,
+        "send_summary": True,
+        "summary_new_count": 1,
+    }

@@ -235,6 +235,8 @@ class EmailNotificationConfig(NotificationConfig):
         item_name: str | None = None,
         marketplace_name: str | None = None,
         send_empty: bool = False,
+        send_summary: bool = False,
+        summary_new_count: int = 0,
     ) -> bool:
         if not self._has_required_fields():
             if logger:
@@ -245,6 +247,15 @@ class EmailNotificationConfig(NotificationConfig):
 
         if send_empty and not listings:
             title, message = self.empty_search_result_message(item_name, marketplace_name)
+            html_message = f"<html><body><p>{escape(message)}</p></body></html>"
+            return self.send_email_message(title, message, html_message, [], logger=logger)
+
+        if send_summary:
+            title, message = self.search_completion_message(
+                item_name,
+                marketplace_name,
+                summary_new_count,
+            )
             html_message = f"<html><body><p>{escape(message)}</p></body></html>"
             return self.send_email_message(title, message, html_message, [], logger=logger)
 

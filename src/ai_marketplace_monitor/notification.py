@@ -104,6 +104,24 @@ class NotificationConfig(BaseConfig):
         )
         return title, message
 
+    @staticmethod
+    def search_completion_message(
+        item_name: str | None,
+        marketplace_name: str | None,
+        new_count: int,
+    ) -> tuple[str, str]:
+        item_label = item_name or "listing"
+        marketplace_label = marketplace_name or "marketplace"
+        title = (
+            f"Search completed for {item_label} on {marketplace_label}: "
+            f"{new_count} new {'listing' if new_count == 1 else 'listings'}"
+        )
+        message = (
+            f"Search finished for {item_label} on {marketplace_label}. "
+            f"Found {new_count} new {'listing' if new_count == 1 else 'listings'}."
+        )
+        return title, message
+
     def _execute_with_retry(
         self: "NotificationConfig",
         title: str,
@@ -330,6 +348,8 @@ class PushNotificationConfig(NotificationConfig):
         item_name: str | None = None,
         marketplace_name: str | None = None,
         send_empty: bool = False,
+        send_summary: bool = False,
+        summary_new_count: int = 0,
     ) -> bool:
         if not self._has_required_fields():
             if logger:
@@ -339,6 +359,13 @@ class PushNotificationConfig(NotificationConfig):
             return False
         if send_empty and not listings:
             title, message = self.empty_search_result_message(item_name, marketplace_name)
+            return self.send_message_with_retry(title, message, logger=logger)
+        if send_summary:
+            title, message = self.search_completion_message(
+                item_name,
+                marketplace_name,
+                summary_new_count,
+            )
             return self.send_message_with_retry(title, message, logger=logger)
         #
         # we send listings with different status with different messages
