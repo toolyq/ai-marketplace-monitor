@@ -1,0 +1,9 @@
+{
+  "keywords": ["laptop", "notebook", "desktop", "pc", "computer", "macbook", "mac mini", "mac studio", "imac"],
+  "exclude_keywords": ["bag", "sleeve", "stand", "sticker", "case", "charger only", "mouse", "keyboard", "webcam", "dock", "adapter"],
+  "brands": [],
+  "cpu_keywords": [],
+  "ram_keywords": [],
+  "storage_keywords": [],
+  "gpu_keywords": []
+}
