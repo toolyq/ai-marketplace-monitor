@@ -15,7 +15,7 @@ from playwright.sync_api import Browser, ElementHandle, Page  # type: ignore
 from rich.pretty import pretty_repr
 
 from .listing import Listing
-from .marketplace import ItemConfig, Marketplace, MarketplaceConfig, WebPage
+from .marketplace import ItemConfig, Marketplace, MarketplaceConfig, SearchPhraseComplete, WebPage
 from .utils import (
     BaseConfig,
     CacheType,
@@ -382,7 +382,7 @@ class FacebookMarketplace(Marketplace):
 
     def search(
         self: "FacebookMarketplace", item_config: FacebookItemConfig
-    ) -> Generator[Listing, None, None]:
+    ) -> Generator[Listing | SearchPhraseComplete, None, None]:
         if not self.page:
             self.login()
             assert self.page is not None
@@ -587,6 +587,8 @@ class FacebookMarketplace(Marketplace):
                     else:
                         listing.mark_excluded(listing.post_url)
                         counter.increment(CounterItem.EXCLUDED_LISTING, item_config.name)
+
+                yield SearchPhraseComplete(search_phrase=search_phrase, city=cname or city, new_count=0)
 
     def get_listing_details(
         self: "FacebookMarketplace",

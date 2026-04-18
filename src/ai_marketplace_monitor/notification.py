@@ -109,15 +109,17 @@ class NotificationConfig(BaseConfig):
         item_name: str | None,
         marketplace_name: str | None,
         new_count: int,
+        search_phrase: str | None = None,
     ) -> tuple[str, str]:
         item_label = item_name or "listing"
         marketplace_label = marketplace_name or "marketplace"
+        phrase_label = f" (keyword: {search_phrase})" if search_phrase else ""
         title = (
-            f"Search completed for {item_label} on {marketplace_label}: "
+            f"Search completed for {item_label} on {marketplace_label}{phrase_label}: "
             f"{new_count} new {'listing' if new_count == 1 else 'listings'}"
         )
         message = (
-            f"Search finished for {item_label} on {marketplace_label}. "
+            f"Search finished for {item_label} on {marketplace_label}{phrase_label}. "
             f"Found {new_count} new {'listing' if new_count == 1 else 'listings'}."
         )
         return title, message
@@ -350,6 +352,7 @@ class PushNotificationConfig(NotificationConfig):
         send_empty: bool = False,
         send_summary: bool = False,
         summary_new_count: int = 0,
+        summary_search_phrase: str | None = None,
     ) -> bool:
         if not self._has_required_fields():
             if logger:
@@ -365,6 +368,7 @@ class PushNotificationConfig(NotificationConfig):
                 item_name,
                 marketplace_name,
                 summary_new_count,
+                summary_search_phrase,
             )
             return self.send_message_with_retry(title, message, logger=logger)
         #

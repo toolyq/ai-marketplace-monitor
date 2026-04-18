@@ -447,6 +447,15 @@ class ItemConfig(MarketItemCommonConfig):
             raise ValueError(f"Item {hilight(self.name)} description must be a string.")
 
 
+@dataclass
+class SearchPhraseComplete:
+    """Sentinel yielded by Marketplace.search() after each search_phrase is exhausted."""
+
+    search_phrase: str
+    city: str | None
+    new_count: int
+
+
 TMarketplaceConfig = TypeVar("TMarketplaceConfig", bound=MarketplaceConfig)
 TItemConfig = TypeVar("TItemConfig", bound=ItemConfig)
 

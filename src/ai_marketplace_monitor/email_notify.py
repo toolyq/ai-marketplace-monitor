@@ -237,6 +237,7 @@ class EmailNotificationConfig(NotificationConfig):
         send_empty: bool = False,
         send_summary: bool = False,
         summary_new_count: int = 0,
+        summary_search_phrase: str | None = None,
     ) -> bool:
         if not self._has_required_fields():
             if logger:
@@ -255,6 +256,7 @@ class EmailNotificationConfig(NotificationConfig):
                 item_name,
                 marketplace_name,
                 summary_new_count,
+                summary_search_phrase,
             )
             html_message = f"<html><body><p>{escape(message)}</p></body></html>"
             return self.send_email_message(title, message, html_message, [], logger=logger)

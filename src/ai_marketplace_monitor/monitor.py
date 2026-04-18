@@ -15,7 +15,7 @@ from rich.prompt import Prompt
 from .ai import AIBackend, AIResponse
 from .config import Config, supported_ai_backends, supported_marketplaces
 from .listing import Listing
-from .marketplace import Marketplace, TItemConfig, TMarketplaceConfig
+from .marketplace import Marketplace, SearchPhraseComplete, TItemConfig, TMarketplaceConfig
 from .notification import NotificationStatus
 from .user import User
 from .utils import (
@@ -174,12 +174,26 @@ class MarketplaceMonitor:
         """Search for an item on the marketplace."""
         new_listings: List[Listing] = []
         listing_ratings = []
+        phrase_new_count = 0
         # users to notify is determined from item, then marketplace, then all users
         assert self.config is not None
         users_to_notify = (
             item_config.notify or marketplace_config.notify or list(self.config.user.keys())
         )
         for listing in marketplace.search(item_config):
+            # handle per-search-phrase completion sentinel
+            if isinstance(listing, SearchPhraseComplete):
+                for user in users_to_notify:
+                    User(self.config.user[user], logger=self.logger).notify(
+                        [],
+                        [],
+                        item_config,
+                        marketplace_name=marketplace_config.name,
+                        send_summary=True,
+                        summary_new_count=phrase_new_count,
+                    )
+                phrase_new_count = 0
+                continue
             # duplicated ID should not happen, but sellers could repost the same listing,
             # potentially under different seller names
             if listing.id in [x.id for x in new_listings] or listing.content in [
@@ -266,6 +280,7 @@ class MarketplaceMonitor:
                 continue
             new_listings.append(listing)
             listing_ratings.append(res)
+            phrase_new_count += 1
             for user in users_to_notify:
                 User(self.config.user[user], logger=self.logger).notify(
                     [listing],
