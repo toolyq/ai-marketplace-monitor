@@ -1,0 +1,19 @@
+{
+  "keywords": ["laptop", "notebook", "desktop", "pc", "computer"],
+  "exclude_keywords": ["bag", "sleeve", "stand", "sticker", "case", "charger only", "dock", "adapter"],
+  "brands": [],
+  "cpu_keywords": [],
+  "ram_keywords": [],
+  "storage_keywords": [],
+  "gpu_keywords": [
+    "16gb vram",
+    "16g vram",
+    "rtx 4070 ti super",
+    "rtx 4080",
+    "rtx 4090",
+    "rx 6800",
+    "rx 7800 xt",
+    "rx 7900 xt",
+    "rx 7900 xtx"
+  ]
+}

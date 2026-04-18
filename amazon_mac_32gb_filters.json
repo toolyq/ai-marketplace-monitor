@@ -1,0 +1,20 @@
+{
+  "keywords": ["macbook pro", "mac mini", "mac studio", "imac", "mac"],
+  "exclude_keywords": [
+    "intel",
+    "core i5",
+    "core i7",
+    "core i9",
+    "bag",
+    "sleeve",
+    "stand",
+    "sticker",
+    "case",
+    "charger only"
+  ],
+  "brands": ["apple"],
+  "cpu_keywords": ["m1", "m2", "m3", "m4"],
+  "ram_keywords": ["32gb", "36gb", "48gb", "64gb", "96gb", "128gb", "32g", "36g", "48g", "64g"],
+  "storage_keywords": [],
+  "gpu_keywords": []
+}
