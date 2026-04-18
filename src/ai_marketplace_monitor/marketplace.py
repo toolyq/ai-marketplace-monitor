@@ -526,7 +526,31 @@ class Marketplace(Generic[TMarketplaceConfig, TItemConfig]):
             else:
                 context = self.browser.new_context(proxy=proxy_options)
             self.page = context.new_page()
+            self._configure_page_resource_policy(self.page)
         return self.page
+
+    def _configure_page_resource_policy(self: "Marketplace", page: Page) -> None:
+        blocked_resource_types = set()
+        if self.config.monitor_config and self.config.monitor_config.disable_images:
+            blocked_resource_types.add("image")
+        if self.config.monitor_config and self.config.monitor_config.disable_videos:
+            blocked_resource_types.add("media")
+
+        if not blocked_resource_types:
+            return
+
+        if self.logger:
+            self.logger.info(
+                f"{hilight('[Browser]', 'info')} Blocking resource types: {', '.join(sorted(blocked_resource_types))}."
+            )
+
+        def handle_route(route: Any, request: Any) -> None:
+            if request.resource_type in blocked_resource_types:
+                route.abort()
+                return
+            route.continue_()
+
+        page.route("**/*", handle_route)
 
     def goto_url(self: "Marketplace", url: str, attempt: int = 0) -> None:
         try:

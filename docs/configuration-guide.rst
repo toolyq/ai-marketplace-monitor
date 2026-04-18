@@ -500,9 +500,13 @@ CDP Browser Connection
     [monitor]
     cdp_url = "http://127.0.0.1:9222"
     cdp_timeout = 30000
+    disable_images = true
+    disable_videos = true
 
 - ``cdp_url`` supports ``http(s)://`` and ``ws(s)://`` endpoints.
 - ``cdp_timeout`` is optional and uses milliseconds.
+- ``disable_images`` blocks image requests.
+- ``disable_videos`` blocks media/video requests.
 
 Example launch command:
 

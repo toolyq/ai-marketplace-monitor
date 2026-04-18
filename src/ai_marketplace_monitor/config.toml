@@ -5,6 +5,9 @@
 [monitor]
 cdp_url = "http://127.0.0.1:9222"
 cdp_timeout = 30000
+# Optional: reduce bandwidth/CPU when scraping.
+disable_images = true
+disable_videos = true
 
 #
 # Region definitions.

@@ -324,6 +324,8 @@ class BaseConfig:
 class MonitorConfig(BaseConfig):
     cdp_url: str | None = None
     cdp_timeout: int | None = None
+    disable_images: bool = False
+    disable_videos: bool = False
     proxy_server: List[str] | None = None
     proxy_bypass: str | None = None
     proxy_username: str | None = None
@@ -357,6 +359,14 @@ class MonitorConfig(BaseConfig):
             raise ValueError(
                 f"Item {hilight(self.name)} cdp_timeout must be a non-negative number."
             )
+
+    def handle_disable_images(self: "MonitorConfig") -> None:
+        if not isinstance(self.disable_images, bool):
+            raise ValueError(f"Item {hilight(self.name)} disable_images must be a boolean.")
+
+    def handle_disable_videos(self: "MonitorConfig") -> None:
+        if not isinstance(self.disable_videos, bool):
+            raise ValueError(f"Item {hilight(self.name)} disable_videos must be a boolean.")
 
     def handle_proxy_server(self: "MonitorConfig") -> None:
         if self.proxy_server is None:
