@@ -28,8 +28,14 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
-from urllib.parse import urlencode
+from urllib.parse import unquote, urlencode, urlparse, parse_qs
 from urllib.request import Request, urlopen
+
+try:
+    from openai import OpenAI  # type: ignore
+    _OPENAI_AVAILABLE = True
+except ImportError:
+    _OPENAI_AVAILABLE = False
 
 from playwright.sync_api import Page, sync_playwright
 
@@ -129,6 +135,19 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--telegram-bot-token", default="", help="Telegram bot token.")
     parser.add_argument("--telegram-chat-id", default="", help="Telegram chat ID.")
+
+    # AI evaluation
+    parser.add_argument("--ai-base-url", default="", help="OpenAI-compatible API base URL, e.g. http://localhost:1234/v1")
+    parser.add_argument("--ai-api-key", default="ollama", help="API key (use any string for local models).")
+    parser.add_argument("--ai-model", default="", help="Model name, e.g. deepseek-r1:14b")
+    parser.add_argument("--ai-description", default="", help="What you're looking for (used in AI prompt).")
+    parser.add_argument("--ai-extra-prompt", default="", help="Extra instructions appended to the AI prompt.")
+    parser.add_argument(
+        "--min-rating",
+        type=int,
+        default=0,
+        help="Minimum AI rating (1-5) to send notification. 0 = disable AI filter.",
+    )
     return parser.parse_args()
 
 
@@ -196,34 +215,34 @@ def in_price_range(price: float | None, min_price: float | None, max_price: floa
 def extract_products(page: Page, domain: str) -> list[Product]:
     products: list[Product] = []
 
-    # Primary selector used by most Amazon layouts
     cards = page.locator("[data-component-type='s-search-result']")
     count = cards.count()
-
-    # Fallback: some Amazon layouts wrap results in div.s-result-item with data-asin
-    if count == 0:
-        cards = page.locator("div.s-result-item[data-asin]")
-        count = cards.count()
-    if count == 0:
-        # Last resort: any element with a non-empty data-asin
-        cards = page.locator("[data-asin]:not([data-asin=''])")
-        count = cards.count()
 
     print(f"  -> Card elements found: {count}")
 
     for idx in range(count):
         card = cards.nth(idx)
         asin = (card.get_attribute("data-asin") or "").strip()
-        title = card.locator("h2 span").first.inner_text().strip() if card.locator("h2 span").count() else ""
-        link = card.locator("h2 a").first.get_attribute("href") if card.locator("h2 a").count() else None
+
+        # Title
+        title_loc = card.locator("h2 span")
+        title = title_loc.first.inner_text().strip() if title_loc.count() else ""
+
+        # Link
+        link = None
+        link_loc = card.locator("a.a-link-normal")
+        if link_loc.count():
+            link = link_loc.first.get_attribute("href") or None
+
         if not asin or not title or not link:
             continue
 
-        price_text = (
-            card.locator(".a-price .a-offscreen").first.inner_text().strip()
-            if card.locator(".a-price .a-offscreen").count()
-            else ""
-        )
+        # Price
+        price_text = ""
+        price_loc = card.locator(".a-price .a-offscreen")
+        if price_loc.count():
+            price_text = price_loc.first.inner_text().strip()
+
         rating_text = (
             card.locator("span.a-icon-alt").first.inner_text().strip()
             if card.locator("span.a-icon-alt").count()
@@ -236,7 +255,8 @@ def extract_products(page: Page, domain: str) -> list[Product]:
         )
         price = parse_price(price_text)
 
-        full_url = f"https://{domain}{link}" if link.startswith("/") else link
+        raw_url = f"https://{domain}{link}" if link.startswith("/") else link
+        full_url = extract_dp_url(raw_url, domain)
         products.append(
             Product(
                 asin=asin,
@@ -298,27 +318,129 @@ def apply_filter_file(args: argparse.Namespace) -> None:
     args.gpu_keywords = merge_list_option(args.gpu_keywords, raw.get("gpu_keywords"))
 
 
-def format_message(items: list[Product], query: str, domain: str) -> str:
-    lines = [f"Amazon new matches for query: {query} ({domain})", ""]
-    for idx, item in enumerate(items, start=1):
-        price_display = f"${item.price:.2f}" if item.price is not None else "N/A"
-        lines.append(f"{idx}. {item.title}")
-        lines.append(f"Price: {price_display}")
-        if item.rating:
-            lines.append(f"Rating: {item.rating}")
-        if item.reviews:
-            lines.append(f"Reviews: {item.reviews}")
-        lines.append(f"URL: {item.url}")
-        lines.append("")
-    return "\n".join(lines).strip()
+@dataclass
+class AIResult:
+    score: int
+    comment: str
+
+    SCORE_LABELS: dict = None  # type: ignore
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "SCORE_LABELS", {
+            1: "No match", 2: "Possible", 3: "Average", 4: "Good", 5: "Great deal"
+        })
+
+    @property
+    def label(self) -> str:
+        return self.SCORE_LABELS.get(self.score, str(self.score))  # type: ignore
+
+
+def build_ai_prompt(title: str, price: float | None, query: str, description: str, extra_prompt: str, min_price: float | None, max_price: float | None) -> str:
+    price_str = f"${price:.2f}" if price is not None else "unknown"
+    prompt = f"用户想在 Amazon 购买：{query}。\n"
+    if description:
+        prompt += f"需求描述：{description}。\n"
+    if max_price and min_price:
+        prompt += f"价格范围：${min_price:.0f} 到 ${max_price:.0f}。\n"
+    elif max_price:
+        prompt += f"最高价：${max_price:.0f}。\n"
+    prompt += f"\n商品标题：{title}\n价格：{price_str}\n"
+    if extra_prompt:
+        prompt += f"\n{extra_prompt.strip()}\n"
+    prompt += (
+        "\n请按 1 到 5 分评估该商品与用户需求的匹配度：\n"
+        "1 - 不匹配：规格不符或明显不是用户想要的。\n"
+        "2 - 可能匹配：信息不足，需确认。\n"
+        "3 - 一般：部分符合，有明显不足。\n"
+        "4 - 较好：大部分符合，规格清晰。\n"
+        "5 - 非常好：高度匹配，性价比突出。\n"
+        "最后一行必须使用格式：\n"
+        '"Rating <1-5>: <30字以内建议>"'
+    )
+    return prompt
+
+
+def evaluate_with_ai(
+    title: str,
+    price: float | None,
+    query: str,
+    args: argparse.Namespace,
+) -> AIResult | None:
+    if not _OPENAI_AVAILABLE:
+        print("[AI] openai package not available, skipping AI evaluation.", file=sys.stderr)
+        return None
+    if not args.ai_base_url or not args.ai_model:
+        return None
+    prompt = build_ai_prompt(
+        title, price, query,
+        args.ai_description, args.ai_extra_prompt,
+        args.min_price, args.max_price,
+    )
+    try:
+        client = OpenAI(base_url=args.ai_base_url, api_key=args.ai_api_key)
+        response = client.chat.completions.create(
+            model=args.ai_model,
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that evaluates whether an Amazon product matches the user's requirements."},
+                {"role": "user", "content": prompt},
+            ],
+            stream=False,
+        )
+        answer = response.choices[0].message.content or ""
+        score = 1
+        comment = ""
+        rating_line_idx = None
+        for idx, line in enumerate(answer.split("\n")):
+            m = re.match(r".*Rating[^1-5]*([1-5])[:\s]*(.*)", line)
+            if m:
+                score = int(m.group(1))
+                comment = m.group(2).strip()
+                rating_line_idx = idx
+        lines = answer.split("\n")
+        if not comment.strip() and rating_line_idx is not None and rating_line_idx > 0:
+            comment = lines[rating_line_idx - 1]
+        comment = " ".join(comment.split()).strip()
+        return AIResult(score=score, comment=comment)
+    except Exception as exc:
+        print(f"[AI] Evaluation failed: {exc}", file=sys.stderr)
+        return None
+
+
+def extract_dp_url(raw: str, domain: str) -> str:
+    """Convert sspa/click redirect URLs to clean https://<domain>/dp/<ASIN> links."""
+    if "/sspa/click" in raw:
+        parsed = urlparse(raw)
+        qs = parse_qs(parsed.query)
+        inner = qs.get("url", [""])[0]
+        if inner:
+            inner = unquote(inner)
+            if inner.startswith("/"):
+                inner = f"https://{domain}{inner}"
+            # Strip query string from inner link to keep it clean
+            inner_parsed = urlparse(inner)
+            return f"https://{domain}{inner_parsed.path}"
+    return raw
+
+
+def format_product_message(item: Product, query: str, domain: str, ai_result: "AIResult | None" = None) -> str:
+    price_display = f"${item.price:.2f}" if item.price is not None else "N/A"
+    lines = [
+        f"[Amazon {domain}] {query}",
+        item.title,
+        f"Price: {price_display}",
+    ]
+    if item.rating:
+        lines.append(f"Rating: {item.rating}")
+    if ai_result is not None:
+        lines.append(f"AI [{ai_result.score}/5 {ai_result.label}]: {ai_result.comment}")
+    lines.append(item.url)
+    return "\n".join(lines)
 
 
 def send_telegram(bot_token: str, chat_id: str, message: str) -> None:
-    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-    payload = urlencode({"chat_id": chat_id, "text": message, "disable_web_page_preview": "true"}).encode(
-        "utf-8"
-    )
-    req = Request(url, data=payload, method="POST")
+    api_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    payload = urlencode({"chat_id": chat_id, "text": message, "disable_web_page_preview": "true"}).encode("utf-8")
+    req = Request(api_url, data=payload, method="POST")
     req.add_header("Content-Type", "application/x-www-form-urlencoded")
     with urlopen(req, timeout=20) as resp:
         status = getattr(resp, "status", 200)
@@ -407,12 +529,34 @@ def run_once(args: argparse.Namespace) -> int:
     unique_by_asin: dict[str, Product] = {item.asin: item for item in all_candidates}
     matches = list(unique_by_asin.values())
 
-    message = format_message(matches, args.query, args.domain)
-    print(message)
+    use_ai = bool(args.ai_base_url and args.ai_model)
+    sent = 0
+    for item in matches:
+        # AI evaluation
+        ai_result: AIResult | None = None
+        if use_ai:
+            print(f"  [AI] Evaluating: {item.title[:80]}...")
+            ai_result = evaluate_with_ai(item.title, item.price, args.query, args)
+            if ai_result:
+                print(f"  [AI] Score {ai_result.score}/5 - {ai_result.comment}")
+            if args.min_rating > 0 and (ai_result is None or ai_result.score < args.min_rating):
+                score_str = str(ai_result.score) if ai_result else "N/A"
+                print(f"  [AI] Skipped (score {score_str} < min {args.min_rating}): {item.title[:60]}")
+                continue
+
+        msg = format_product_message(item, args.query, args.domain, ai_result)
+        print(msg)
+        print()
+        if args.telegram_bot_token and args.telegram_chat_id:
+            try:
+                send_telegram(args.telegram_bot_token, args.telegram_chat_id, msg)
+                sent += 1
+                time.sleep(0.5)  # avoid Telegram rate limit
+            except Exception as exc:
+                print(f"  [WARN] Failed to send Telegram for {item.asin}: {exc}", file=sys.stderr)
 
     if args.telegram_bot_token and args.telegram_chat_id:
-        send_telegram(args.telegram_bot_token, args.telegram_chat_id, message)
-        print(f"Telegram message sent: {len(matches)} items.")
+        print(f"Telegram: sent {sent}/{len(matches)} messages.")
     else:
         print("Telegram not configured, only printed to stdout.")
 
