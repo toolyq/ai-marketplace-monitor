@@ -8,6 +8,7 @@ cdp_timeout = 30000
 # Optional: reduce bandwidth/CPU when scraping.
 disable_images = true
 disable_videos = true
+max_script_size = 5000   # 5 KB，超过的 JS 文件直接拒绝
 
 #
 # Region definitions.

@@ -543,18 +543,50 @@ class Marketplace(Generic[TMarketplaceConfig, TItemConfig]):
         if self.config.monitor_config and self.config.monitor_config.disable_videos:
             blocked_resource_types.add("media")
 
-        if not blocked_resource_types:
+        max_script_size = (
+            self.config.monitor_config.max_script_size
+            if self.config.monitor_config
+            else None
+        )
+
+        if not blocked_resource_types and max_script_size is None:
             return
 
+        log_parts = []
+        if blocked_resource_types:
+            log_parts.append(f"Blocking resource types: {', '.join(sorted(blocked_resource_types))}")
+        if max_script_size is not None:
+            log_parts.append(f"Blocking scripts larger than {max_script_size} bytes")
         if self.logger:
             self.logger.info(
-                f"{hilight('[Browser]', 'info')} Blocking resource types: {', '.join(sorted(blocked_resource_types))}."
+                f"{hilight('[Browser]', 'info')} {'; '.join(log_parts)}."
             )
 
         def handle_route(route: Any, request: Any) -> None:
+            large_script_urls: set = set()
             if request.resource_type in blocked_resource_types:
                 route.abort()
                 return
+            if max_script_size is not None and request.resource_type == "script":
+                url_no_qs = request.url.split("?")[0]
+                if url_no_qs in large_script_urls:
+                    route.abort()
+                    return
+                try:
+                    response = route.fetch()
+                    cl = response.headers.get("content-length")
+                    if cl is not None and int(cl) > max_script_size:
+                        large_script_urls.add(url_no_qs)
+                        if self.logger:
+                            self.logger.debug(
+                                f"{hilight('[Browser]', 'info')} Blocked large script ({cl} bytes): {request.url[:80]}"
+                            )
+                        route.fulfill(status=200, content_type="application/javascript", body="")
+                        return
+                    route.fulfill(response=response)
+                    return
+                except Exception:
+                    pass
             route.continue_()
 
         page.route("**/*", handle_route)

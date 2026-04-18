@@ -327,6 +327,7 @@ class MonitorConfig(BaseConfig):
     cdp_timeout: int | None = None
     disable_images: bool = False
     disable_videos: bool = False
+    max_script_size: int | None = None  # bytes; scripts larger than this are blocked
     proxy_server: List[str] | None = None
     proxy_bypass: str | None = None
     proxy_username: str | None = None
@@ -368,6 +369,20 @@ class MonitorConfig(BaseConfig):
     def handle_disable_videos(self: "MonitorConfig") -> None:
         if not isinstance(self.disable_videos, bool):
             raise ValueError(f"Item {hilight(self.name)} disable_videos must be a boolean.")
+
+    def handle_max_script_size(self: "MonitorConfig") -> None:
+        if self.max_script_size is None:
+            return
+        if isinstance(self.max_script_size, str):
+            if not self.max_script_size.isdigit():
+                raise ValueError(
+                    f"Item {hilight(self.name)} max_script_size must be a positive integer (bytes)."
+                )
+            self.max_script_size = int(self.max_script_size)
+        if not isinstance(self.max_script_size, int) or self.max_script_size <= 0:
+            raise ValueError(
+                f"Item {hilight(self.name)} max_script_size must be a positive integer (bytes)."
+            )
 
     def handle_proxy_server(self: "MonitorConfig") -> None:
         if self.proxy_server is None:
