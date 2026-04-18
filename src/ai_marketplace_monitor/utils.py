@@ -76,6 +76,7 @@ class CacheType(Enum):
     LISTING_DETAILS = "listing-details"
     AI_INQUIRY = "ai-inquiries"
     USER_NOTIFIED = "user-notifications"
+    LISTING_EXCLUDED = "listing-excluded"
     COUNTERS = "counters"
 
 

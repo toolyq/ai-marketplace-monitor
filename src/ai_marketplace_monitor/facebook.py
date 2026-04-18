@@ -18,6 +18,7 @@ from .listing import Listing
 from .marketplace import ItemConfig, Marketplace, MarketplaceConfig, WebPage
 from .utils import (
     BaseConfig,
+    CacheType,
     CounterItem,
     KeyboardMonitor,
     Translator,
@@ -536,6 +537,12 @@ class FacebookMarketplace(Marketplace):
                     if not self.check_listing(listing, item_config, description_available=False):
                         counter.increment(CounterItem.EXCLUDED_LISTING, item_config.name)
                         continue
+                    # Skip listings that were previously excluded with the same price —
+                    # avoids opening the browser page and triggering background media loading.
+                    url_no_qs = listing.post_url.split("?")[0]
+                    if Listing.is_excluded(url_no_qs, listing.price):
+                        counter.increment(CounterItem.EXCLUDED_LISTING, item_config.name)
+                        continue
                     try:
                         details, from_cache = self.get_listing_details(
                             listing.post_url,
@@ -578,6 +585,7 @@ class FacebookMarketplace(Marketplace):
                     if self.check_listing(listing, item_config):
                         yield listing
                     else:
+                        listing.mark_excluded(listing.post_url)
                         counter.increment(CounterItem.EXCLUDED_LISTING, item_config.name)
 
     def get_listing_details(
@@ -679,7 +687,7 @@ class FacebookMarketplace(Marketplace):
 
 
 class FacebookSearchResultPage(WebPage):
-    max_listings = 100
+    max_listings = 20
 
     def _count_listing_elements(self: "FacebookSearchResultPage") -> int:
         return len(

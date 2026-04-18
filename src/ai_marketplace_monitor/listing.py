@@ -5,6 +5,10 @@ from diskcache import Cache  # type: ignore
 
 from .utils import CacheType, cache, hash_dict
 
+# TTL for the excluded-listing cache: 7 days.  If a listing stays in search
+# results longer than this (or config changes), it will be re-examined.
+_EXCLUDED_TTL = 7 * 24 * 3600
+
 
 @dataclass
 class Listing:
@@ -66,3 +70,29 @@ class Listing:
             asdict(self),
             tag=CacheType.LISTING_DETAILS.value,
         )
+
+    def mark_excluded(
+        self: "Listing",
+        post_url: str,
+        local_cache: Cache | None = None,
+    ) -> None:
+        """Remember that this listing was excluded so it can be skipped next run."""
+        (cache if local_cache is None else local_cache).set(
+            (CacheType.LISTING_EXCLUDED.value, post_url.split("?")[0]),
+            self.price,
+            expire=_EXCLUDED_TTL,
+            tag=CacheType.LISTING_EXCLUDED.value,
+        )
+
+    @classmethod
+    def is_excluded(
+        cls: Type["Listing"],
+        post_url: str,
+        price: str | None,
+        local_cache: Cache | None = None,
+    ) -> bool:
+        """Return True if this listing was excluded previously with the same price."""
+        cached_price = (cache if local_cache is None else local_cache).get(
+            (CacheType.LISTING_EXCLUDED.value, post_url.split("?")[0])
+        )
+        return cached_price is not None and cached_price == price

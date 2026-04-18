@@ -521,10 +521,17 @@ class Marketplace(Generic[TMarketplaceConfig, TItemConfig]):
 
             # CDP-attached browsers often provide pre-existing contexts.
             # Reuse them by default for compatibility.
+            disable_videos = (
+                self.config.monitor_config is not None
+                and self.config.monitor_config.disable_videos
+            )
             if self.browser.contexts and proxy_options is None:
                 context = self.browser.contexts[0]
             else:
-                context = self.browser.new_context(proxy=proxy_options)
+                context = self.browser.new_context(
+                    proxy=proxy_options,
+                    service_workers="block" if disable_videos else "allow",
+                )
             self.page = context.new_page()
             self._configure_page_resource_policy(self.page)
         return self.page
