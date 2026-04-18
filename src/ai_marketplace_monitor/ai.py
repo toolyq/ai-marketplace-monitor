@@ -201,9 +201,10 @@ class AIBackend(Generic[TAIConfig]):
             prompt += f""" The listing title and description MUST semantically match the following keyword criteria: "{'; '.join(keywords_list)}". If the listing does not match, rate it 1."""
         #
         prompt += (
-            f"""\n\nThe user found a listing titled "{listing.title}" in {listing.condition} condition, """
-            f"""priced at {listing.price}, located in {listing.location}, """
-            f"""posted at {listing.post_url} with description "{listing.description}"\n\n"""
+            f"""\n\nThe user found a listing:  """
+            # f"""priced at {listing.price}, located in {listing.location}, """
+            # f"""posted at {listing.post_url} with description "{listing.description}"\n\n"""
+            f""" "{listing.description}"\n\n"""
         )
         # prompt
         if item_config.prompt is not None:
