@@ -18,7 +18,7 @@ The web UI provides:
 Simply run the monitor:
 
 ```bash
-ai-marketplace-monitor
+python monitor.py
 ```
 
 The web UI is available at [http://127.0.0.1:8467](http://127.0.0.1:8467). A startup banner in the terminal shows the URL:
@@ -39,7 +39,7 @@ On localhost, **no password is required**. Open the URL in your browser and star
 If you don't need the web UI, disable it with:
 
 ```bash
-ai-marketplace-monitor --no-webui
+python monitor.py --no-webui
 ```
 
 ## Changing the Port
@@ -47,7 +47,7 @@ ai-marketplace-monitor --no-webui
 To use a different port:
 
 ```bash
-ai-marketplace-monitor --webui-port 9090
+python monitor.py --webui-port 9090
 ```
 
 ## Advanced: Remote Access
@@ -88,7 +88,7 @@ export FACEBOOK_PASSWORD="your-password"
 Use `--webui-host` to listen on all interfaces:
 
 ```bash
-ai-marketplace-monitor --webui-host 0.0.0.0
+python monitor.py --webui-host 0.0.0.0
 ```
 
 The startup banner will show all reachable URLs:
@@ -109,7 +109,7 @@ The startup banner will show all reachable URLs:
 You can also specify a port:
 
 ```bash
-ai-marketplace-monitor --webui-host 0.0.0.0 --webui-port 9090
+python monitor.py --webui-host 0.0.0.0 --webui-port 9090
 ```
 
 > **Note:** If no credentials are configured, `--webui-host` will refuse to start and display an error. This prevents accidentally exposing an unprotected editor on the network.

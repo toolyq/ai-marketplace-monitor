@@ -12,10 +12,10 @@ Configuration Problems
 
 .. code-block:: text
 
-    Error: Config file ~/.ai-marketplace-monitor/config.toml not found
+    Error: Config file .ai-marketplace-monitor/config.toml not found
 
 *Solution:*
-- Ensure the config file exists at ``~/.ai-marketplace-monitor/config.toml``
+- Ensure the config file exists at ``.ai-marketplace-monitor/config.toml`` in the repository root
 - Check file permissions (should be readable by your user)
 - Use ``--config`` flag to specify a different location
 
@@ -70,7 +70,7 @@ Browser and Playwright Issues
 
 *Solution:*
 - Restart the monitor
-- Try headless mode: ``ai-marketplace-monitor --headless``
+- Try headless mode: ``python monitor.py --headless``
 - Check system resources (RAM, CPU)
 
 Notification Problems
@@ -151,7 +151,7 @@ Performance Issues
 
 *Solutions:*
 - Reduce search frequency in configuration
-- Clear cache: ``ai-marketplace-monitor --clear-cache all``
+- Clear cache: ``python monitor.py --clear-cache all``
 - Check system resources
 - Consider using fewer simultaneous searches
 
@@ -172,7 +172,7 @@ Cache-Related Issues
 
 .. code-block:: console
 
-    $ ai-marketplace-monitor --clear-cache all
+    $ python monitor.py --clear-cache all
 
 **Cache corruption**
 
@@ -185,9 +185,9 @@ Cache-Related Issues
 
 .. code-block:: console
 
-    $ ai-marketplace-monitor --clear-cache listing-details
-    $ ai-marketplace-monitor --clear-cache ai-inquiries
-    $ ai-marketplace-monitor --clear-cache user-notification
+    $ python monitor.py --clear-cache listing-details
+    $ python monitor.py --clear-cache ai-inquiries
+    $ python monitor.py --clear-cache user-notification
 
 Language and Localization Issues
 --------------------------------
@@ -208,12 +208,11 @@ Debug Mode and Logging
 
 **Enable verbose logging**
 
-Add to your configuration:
+Run with verbose logging:
 
-.. code-block:: toml
+.. code-block:: console
 
-    [monitor]
-    log_level = "DEBUG"
+    $ python monitor.py -v
 
 **Check log files**
 
@@ -223,7 +222,7 @@ Logs are typically saved to:
 
 **Interactive debugging**
 
-- Use option ``--check URL`` when starting ai-marketplace-monitor to test individual listings
+- Use option ``--check URL`` when starting ``python monitor.py`` to test individual listings
 - Enter interactive mode by pressing any key while monitor is running. This feature requires the installation of `pynput` package.
 
 Getting Help

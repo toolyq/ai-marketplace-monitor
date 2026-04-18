@@ -44,8 +44,9 @@ from PIL import Image
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
-# home directory for all settings and caches
-amm_home = Path.home() / ".ai-marketplace-monitor"
+# Settings/cache directory for source-only direct-run usage.
+project_root = Path(__file__).resolve().parents[2]
+amm_home = project_root / ".ai-marketplace-monitor"
 amm_home.mkdir(parents=True, exist_ok=True)
 
 cache = Cache(amm_home)

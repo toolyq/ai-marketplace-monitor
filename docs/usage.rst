@@ -9,19 +9,19 @@ Run the monitor with default configuration:
 
 .. code-block:: console
 
-    $ ai-marketplace-monitor
+    $ python monitor.py
 
 Run with a custom configuration file:
 
 .. code-block:: console
 
-    $ ai-marketplace-monitor --config /path/to/your/config.toml
+    $ python monitor.py --config /path/to/your/config.toml
 
 Run in headless mode (without browser window):
 
 .. code-block:: console
 
-    $ ai-marketplace-monitor --headless
+    $ python monitor.py --headless
 
 Check Individual Listings
 -------------------------
@@ -30,13 +30,13 @@ You can check why a listing was excluded or test a listing against your configur
 
 .. code-block:: console
 
-    $ ai-marketplace-monitor --check https://facebook.com/marketplace/item/123456789
+    $ python monitor.py --check https://facebook.com/marketplace/item/123456789
 
 For specific item configurations:
 
 .. code-block:: console
 
-    $ ai-marketplace-monitor --check https://facebook.com/marketplace/item/123456789 --for item_name
+    $ python monitor.py --check https://facebook.com/marketplace/item/123456789 --for item_name
 
 Cache Management
 ---------------
@@ -45,11 +45,11 @@ Clear different types of cache:
 
 .. code-block:: console
 
-    $ ai-marketplace-monitor --clear-cache listing-details
-    $ ai-marketplace-monitor --clear-cache ai-inquiries
-    $ ai-marketplace-monitor --clear-cache user-notification
-    $ ai-marketplace-monitor --clear-cache counters
-    $ ai-marketplace-monitor --clear-cache all
+    $ python monitor.py --clear-cache listing-details
+    $ python monitor.py --clear-cache ai-inquiries
+    $ python monitor.py --clear-cache user-notification
+    $ python monitor.py --clear-cache counters
+    $ python monitor.py --clear-cache all
 
 Important Notes
 --------------
@@ -77,7 +77,7 @@ While the monitor is running, you can:
 * This feature requires the installation of `pynput` package, which can be installed separately or through
 
 ```bash
-pip install 'ai-marketplace-monitor[pynput]'
+uv sync --extra pynput
 ```
 
 You can disable this feature by define environment variable `DISABLE_PYNPUT=true` if `pynput` is already installed.

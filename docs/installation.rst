@@ -10,14 +10,16 @@ Prerequisites
 - Python 3.10 or higher
 - Internet connection
 
-Quick Installation
-------------------
+Source Setup
+------------
 
-Install the program:
+Clone the repository and install dependencies:
 
 .. code-block:: console
 
-    $ pip install ai-marketplace-monitor
+    $ git clone https://github.com/BoPeng/ai-marketplace-monitor.git
+    $ cd ai-marketplace-monitor
+    $ uv sync
 
 Install a browser for Playwright:
 
@@ -29,11 +31,11 @@ For community-contributed instructions, see:
 
 - `Community installation instructions #234 <https://github.com/BoPeng/ai-marketplace-monitor/issues/234>`_
 
-Linux Installation (using pipx)
---------------------------------
+Linux Installation
+------------------
 
 .. include:: linux-installation.md
-   :parser: myst_parser.sphinx_
+    :parser: myst_parser.sphinx_
 
 Development Installation
 ------------------------
@@ -47,4 +49,4 @@ If you want to contribute to the project:
     $ uv sync --extra dev
     $ playwright install
 
-This will install the project with development dependencies using `uv`.
+This sets up the project for direct source execution with development dependencies using `uv`.

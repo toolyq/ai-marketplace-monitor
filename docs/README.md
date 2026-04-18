@@ -14,7 +14,7 @@
 - [Monitor Configuration](#monitor-configuration)
 - [Additional options](#additional-options)
 
-The AI Marketplace Monitor uses [TOML](https://toml.io/en/) configuration files to control its behavior. The system will always check for a configuration file at `~/.ai-marketplace-monitor/config.toml`. You can specify additional configuration files using the `--config` option.
+The AI Marketplace Monitor uses [TOML](https://toml.io/en/) configuration files to control its behavior. In the source-only workflow, the default configuration file is `.ai-marketplace-monitor/config.toml` in the repository root. You can specify additional configuration files using the `--config` option.
 
 To avoid including sensitive information directly in the configuration file, all options that accept a string or a list of string can be specified using the `${ENV_VAR}` format. For example
 

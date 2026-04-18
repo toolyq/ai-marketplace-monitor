@@ -51,10 +51,6 @@ Repository = "https://github.com/BoPeng/ai-marketplace-monitor"
 Documentation = "https://ai-marketplace-monitor.readthedocs.io"
 "Bug Tracker" = "https://github.com/BoPeng/ai-marketplace-monitor/issues"
 
-[project.scripts]
-ai-marketplace-monitor = "ai_marketplace_monitor.cli:app"
-aimm = "ai_marketplace_monitor.cli:app"
-
 [project.optional-dependencies]
 pynput = ["pynput>=1.7.0"]
 dev = [

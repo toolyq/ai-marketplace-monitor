@@ -1,13 +1,13 @@
-If you're using Ubuntu Linux and prefer not to use package managers like conda/mamba or virtual environments, you can install `ai-marketplace-monitor` as a system-wide command using `pipx`.
+If you're using Ubuntu Linux, run the project directly from a local source checkout.
 
 ## Prerequisites
 
-If you haven't used `pipx` before or don't have `$HOME/.local/bin` in your `$PATH`:
+Install system prerequisites and `uv` if needed:
 
 ```bash
 sudo apt update
-sudo apt install pipx
-pipx ensurepath
+sudo apt install curl
+curl -LsSf https://astral.sh/uv/install.sh | sh
 source ~/.bashrc
 ```
 
@@ -16,32 +16,28 @@ source ~/.bashrc
 ## Installation
 
 ```bash
-# Install the main package
-pipx install ai-marketplace-monitor
-
-# Install playwright in the same virtual environment
-pipx inject ai-marketplace-monitor playwright
-
-# Install playwright browsers
+git clone https://github.com/BoPeng/ai-marketplace-monitor.git
+cd ai-marketplace-monitor
+uv sync
 playwright install
 ```
 
-If prompted to install playwright system dependencies, run:
+If prompted to install Playwright system dependencies, run:
 
 ```bash
-sudo /home/YOURUSER/.local/bin/playwright install-deps
+playwright install-deps
 ```
 
 ## Configuration
 
-Edit your configuration file using your preferred text editor:
+Edit the repository-local configuration file using your preferred text editor:
 
 ```bash
 # Using nano
-nano ~/.ai-marketplace-monitor/config.toml
+nano .ai-marketplace-monitor/config.toml
 
 # Using vim
-vim ~/.ai-marketplace-monitor/config.toml
+vim .ai-marketplace-monitor/config.toml
 
 # Or install a code editor via snap (recommended method for VS Code)
 sudo snap install code --classic
@@ -49,13 +45,12 @@ sudo snap install code --classic
 
 ## Verification
 
-To verify the installation was successful:
+To verify the setup was successful:
 
 ```bash
-ai-marketplace-monitor --version
+python monitor.py --version
 ```
 
 ## Troubleshooting
 
-- If you encounter permission issues, ensure `$HOME/.local/bin` is in your PATH
 - If playwright browsers fail to install, you may need to install additional system dependencies with `sudo apt install libnss3-dev libatk-bridge2.0-dev libdrm2-dev`

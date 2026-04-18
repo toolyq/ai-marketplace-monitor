@@ -94,16 +94,18 @@ AI: Great deal; A well-priced, well-maintained camera meets all search criteria,
 
 ### Installation
 
-> **Requires Python 3.10 or higher.** Check your version with `python --version`. If your system default is older, use `pip3.10` (or `pip3.11`, `pip3.12`, etc.) instead of `pip`, or create a virtual environment with the correct version.
+> **Requires Python 3.10 or higher.** This repository is intended to run directly from source.
 
 ```bash
-pip install ai-marketplace-monitor
+git clone https://github.com/BoPeng/ai-marketplace-monitor.git
+cd ai-marketplace-monitor
+uv sync
 playwright install
 ```
 
 ### Basic Configuration
 
-Create `~/.ai-marketplace-monitor/config.toml`:
+Create `.ai-marketplace-monitor/config.toml` in the repository root:
 
 ```toml
 [marketplace.facebook]
@@ -124,7 +126,7 @@ cdp_url = 'http://127.0.0.1:9222'  # Required in strict CDP mode
 ### Run the Monitor
 
 ```bash
-ai-marketplace-monitor
+python monitor.py
 ```
 
 The program will open a browser, search Facebook Marketplace, and notify you of matching items. A web UI also starts automatically at [http://127.0.0.1:8467](http://127.0.0.1:8467) for editing config and monitoring logs — see [Web UI Guide](docs/webui.md).

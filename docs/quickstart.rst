@@ -7,14 +7,16 @@ This guide will get you up and running with AI Marketplace Monitor in under 10 m
 .. warning::
    **Important Legal Notice**: Facebook's EULA prohibits automated data collection without authorization. This tool was developed for personal, hobbyist use only. You are solely responsible for ensuring compliance with platform terms and applicable laws. For commercial use, obtain explicit permission from Meta first.
 
-Step 1: Installation
---------------------
+Step 1: Get the Source
+----------------------
 
-Install AI Marketplace Monitor:
+Clone the repository and install dependencies:
 
 .. code-block:: console
 
-    $ pip install ai-marketplace-monitor
+    $ git clone https://github.com/BoPeng/ai-marketplace-monitor.git
+    $ cd ai-marketplace-monitor
+    $ uv sync
 
 Install Playwright browser:
 
@@ -40,13 +42,7 @@ Choose one notification method:
 Step 3: Create Configuration
 ---------------------------
 
-Create the configuration directory:
-
-.. code-block:: console
-
-    $ mkdir -p ~/.ai-marketplace-monitor
-
-Create a minimal configuration file at ``~/.ai-marketplace-monitor/config.toml``:
+Create a minimal configuration file at ``.ai-marketplace-monitor/config.toml`` in the repository root:
 
 .. code-block:: toml
 
@@ -83,7 +79,7 @@ Start monitoring:
 
 .. code-block:: console
 
-    $ ai-marketplace-monitor
+    $ python monitor.py
 
 What happens next:
 
@@ -100,7 +96,7 @@ To verify everything works, check a specific listing:
 
 .. code-block:: console
 
-    $ ai-marketplace-monitor --check https://facebook.com/marketplace/item/123456789
+    $ python monitor.py --check https://facebook.com/marketplace/item/123456789
 
 Example Output
 -------------
@@ -129,7 +125,7 @@ Common Issues
 -------------
 
 **"Config file not found"**
-   Make sure the file is at ``~/.ai-marketplace-monitor/config.toml``
+    Make sure the file is at ``.ai-marketplace-monitor/config.toml`` in the repository root.
 
 **"Cannot login to Facebook"**
    The monitor will still work but with limited results. Try providing username/password in config.
