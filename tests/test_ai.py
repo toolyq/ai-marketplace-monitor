@@ -51,14 +51,14 @@ def test_extra_prompt(
     assert "extra prompt" not in prompt
     assert "overrides marketplace prompt" in prompt
     #
-    assert "Great deal: Fully matches" in prompt
+    assert "5 - 非常好：高度匹配" in prompt
     item_config.rating_prompt = "something else"
     prompt = ollama.get_prompt(listing, item_config, marketplace_config)
-    assert "Great deal: Fully matches" not in prompt
+    assert "5 - 非常好：高度匹配" not in prompt
     assert "something else" in prompt
     #
-    assert "Evaluate how well this listing" in prompt
+    assert "请判断该商品与用户需求的匹配度" in prompt
     marketplace_config.prompt = "myprompt"
     prompt = ollama.get_prompt(listing, item_config, marketplace_config)
-    assert "Evaluate how well this listing" not in prompt
+    assert "请判断该商品与用户需求的匹配度" not in prompt
     assert "myprompt" in prompt

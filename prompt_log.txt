@@ -1,41 +1,47 @@
-    DEBUG    [AI-Prompt] A user wants to buy a gpu16_pc from    ai.py:242
-                             Facebook Marketplace. Search phrases: "gaming
-                             laptop" and "gaming desktop" and "workstation pc"
-                             and "gaming laptop" and "gaming desktop" and
-                             "workstation pc", Description: "Gaming laptop or
-                             desktop PC with at least 16GB VRAM, powered by a
-                             high-end GPU such as RTX 4080, RTX 4090, RTX 4070
-                             Ti Super, RX 6800, RX 7800 XT, RX 7900 XT, or RX
-                             7900 XTX.", Price range: 100 to 1600.  The listing
-                             title and description MUST semantically match the
-                             following keyword criteria: "(laptop OR notebook
-                             OR desktop OR pc OR computer) AND ("16gb vram" OR
-                             "16 gb vram" OR "rtx 4080" OR "rtx 4090" OR "rtx
-                             4070 ti super" OR "rx 6800" OR "rx 7800 xt" OR "rx
-                             7900 xt" OR "rx 7900 xtx")". If the listing does
-                             not match, rate it 1.
+[AI-Prompt] 用户想在 Facebook Marketplace 购买     ai.py:243
+                             gpu16_pc。搜索词："gaming laptop PC AI
+                             desktop、gaming laptop PC AI
+                             desktop"。需求描述："Gaming laptop or desktop PC
+                             with at least 16GB VRAM, powered by a high-end GPU
+                             such as RTX 4080, RTX 4090, RTX 4070 Ti Super, RX
+                             6800, RX 7800 XT, RX 7900 XT, or RX 7900 XTX."。
+                             标题和描述必须在语义上满足以下关键词条件："(laptop
+                             OR notebook OR desktop OR pc OR computer) AND
+                             ("16g vram")"。不满足时直接评为 1 分。
 
-                             The user found a listing titled "GIGABYTE G5 KF
-                             Gaming Notebook 15.6"" in Used - like new
-                             condition, priced at CA$1,000, located in Toronto,
-                             ON, posted at
-                             https://www.facebook.com/marketplace/item/92925470
-                             9588624/?ref=search&referral_code=null&referral_st
-                             ory_type=post&tracking=browse_serp%3Ac1c29471-80b2
-                             -4e6c-ab42-62b3126ff10c&__tn__=!%3AD with
-                             description "GIGABYTE G5 KF Gaming Notebook 15.6"
-                             FHD 144Hz
-                             Intel i7-12650H GeForce RTX 4060 16GB 512GB SSD
-                             Windows 11 Home
+                             用户找到的商品信息：标题：Dell ALIENWARE AURORA
+                             R12 GAMING Desktop (brand
+                             new)；价格：CA$799；成色：New；链接：https://www.f
+                             acebook.com/marketplace/item/1358266689682879/?ref
+                             =search&referral_code=null&referral_story_type=pos
+                             t&tracking=browse_serp%3Ad891f277-d6b1-4d1f-8c9b-1
+                             cc01be6129e&__tn__=!%3AD。描述："This is brand new
+                             pc in sealed Retail box, Dell ONE YEAR warranty.
+                             E-mail:
+                             Computer store : 770 danforth ave. M4J 1L5
+                             Our business hours are Monday to Friday, 10 am. to
+                             7pm, Saturday 10 am. to 6 pm
 
-                             Barely used. In great condition! No trades please
-                             😊See translation"
+                             Dell ALIENWARE AURORA R12 GAMING Desktop (brand
+                             new)
+                             Intel Core i7-11700F CPU
+                             Nvidia RTX 2060 6GB GPU
+                             16GB, 3200MHz DDR4 Ram
+                             256GB M.2 PCIe NVMe SSD + 1TB 7200 SATA HDD
+                             1000W PSU, Liquid Cooled system
+                             Dell Wireless DW1810 (1x1) 802 .11ac , Bluetooth
+                             5.0
+                             Windows 11 64bit English
 
-                             Evaluate how well this listing matches the user's
-                             criteria. Assess the description, MSRP, model
-                             year, condition, and seller's credibility.
+                             (up to 512GB NVMe SSD +$80)
+                             (up to RTX 3080 10GB +$450)See translation"
+
+                             请判断该商品与用户需求的匹配度，重点考虑描述、价格
+                             合理性、年份、成色和卖家可信度。
 
                              Pay special attention to:
+                             - Make sure the vram of the GPU>=16G, don't care
+                             about the RAM.
                              - The GPU model must be one of: RTX 4080, RTX
                              4090, RTX 4070 Ti Super, RX 6800, RX 7800 XT, RX
                              7900 XT, RX 7900 XTX (or equivalent with 16GB+
@@ -47,168 +53,12 @@
                              - Bundles (e.g., with monitor or peripherals) are
                              fine.
 
-                             Rate from 1 to 5 based on the following:
-                             1 - No match: Missing key details, wrong
-                             category/brand, or suspicious activity (e.g.,
-                             external links).
-                             2 - Potential match: Lacks essential info (e.g.,
-                             condition, brand, or model); needs clarification.
-                             3 - Poor match: Some mismatches or missing
-                             details; acceptable but not ideal.
-                             4 - Good match: Mostly meets criteria with clear,
-                             relevant details.
-                             5 - Great deal: Fully matches criteria, with
-                             excellent condition or price.
-                             Conclude with:
-                             "Rating <1-5>: <summary>"
-                             where <1-5> is the rating and <summary> is a brief
-                             recommendation (max 30 words).
-[04/18/26 00:44:42] DEBUG    [AI-Response] ChatCompletion(                      ai.py:327
-                                 id='chatcmpl-8fzPGm1beoqa84q5nZtBHgKRblvKsjdB'
-                             ,
-                                 choices=[
-                                     Choice(
-                                         finish_reason='stop',
-                                         index=0,
-                                         logprobs=None,
-                                         message=ChatCompletionMessage(
-                                             content='# Listing
-                             Evaluation\n\n## Detailed Analysis\n\n### 1. Item
-                             Type\n- **Listing**: Gaming Notebook (GIGABYTE G5
-                             KF)\n- **Requirement**: Gaming laptop or desktop
-                             PC\n- **Match**: ✓ Yes - "Notebook" is explicitly
-                             allowed in the keyword criteria\n\n### 2. Price
-                             Range\n- **Listing**: CA$1,000\n- **Requirement**:
-                             100 to 1600\n- **Match**: ✓ Yes - Well within
-                             range\n\n### 3. GPU Model (CRITICAL)\n-
-                             **Listing**: GeForce RTX 4060 with 16GB VRAM\n-
-                             **Requirement**: Must be one of: RTX 4080, RTX
-                             4090, RTX 4070 Ti Super, RX 6800, RX 7800 XT, RX
-                             7900 XT, or RX 7900 XTX\n- **Match**: ✗ No - RTX
-                             4060 is NOT in the required list\n\nThe RTX 4060
-                             is a mid-range GPU, significantly below the
-                             specified high-end options. While it has 16GB
-                             VRAM, it doesn\'t meet the GPU model
-                             requirement.\n\n### 4. Keyword Criteria
-                             Analysis\n- **Title**: Contains "Notebook" ✓
-                             (matches "laptop OR notebook")\n- **Description**:
-                             Contains "16GB" ✓ (matches "16gb vram"), but NO
-                             specific GPU keywords ✗\n\nThe keyword criteria
-                             requires: `(laptop OR notebook OR desktop OR pc OR
-                             computer) AND ("16gb vram" OR ... "rtx 4080" OR
-                             ...)`\n\nThis listing only matches the first part
-                             of the AND condition. It fails because it doesn\'t
-                             contain any of the required GPU keywords.\n\n###
-                             5. Condition\n- **Listing**: "Barely used. In
-                             great condition!"\n- **Requirement**: Not
-                             specified, but implied to be good\n- **Match**: ✓
-                             Yes - Excellent condition\n\n### 6. Seller
-                             Credibility\n- **Location**: Toronto, ON (major
-                             city)\n- **Details**: Specific model, specs,
-                             condition stated clearly\n- **Match**: ✓
-                             Reasonable - Standard marketplace
-                             listing\n\n---\n\n## Final Rating: 3 - Poor match:
-                             Some mismatches or missing details; acceptable but
-                             not ideal.\n\nThe listing is a gaming laptop with
-                             16GB VRAM in great condition at a reasonable
-                             price, but the RTX 4060 GPU does not meet the
-                             user\'s specific requirement for high-end GPUs
-                             (RTX 4080/4090 or RX 7800/7900 series). The
-                             keyword criteria is not fully satisfied as it
-                             lacks the required GPU model terms.',
-                                             refusal=None,
-                                             role='assistant',
-                                             annotations=None,
-                                             audio=None,
-                                             function_call=None,
-                                             tool_calls=None,
-                                             reasoning_content='Let me analyze
-                             this listing against the user\'s criteria step by
-                             step.\n\n**User Criteria:**\n1. Item type:
-                             gpu16_pc (gaming laptop or desktop PC)\n2. Search
-                             phrases: "gaming laptop" and "gaming desktop" and
-                             "workstation pc"\n3. Description requirement:
-                             "Gaming laptop or desktop PC with at least 16GB
-                             VRAM, powered by a high-end GPU such as RTX 4080,
-                             RTX 4090, RTX 4070 Ti Super, RX 6800, RX 7800 XT,
-                             RX 7900 XT, or RX 7900 XTX"\n4. Price range: 100
-                             to 1600\n5. Keyword criteria: "(laptop OR notebook
-                             OR desktop OR pc OR computer) AND ("16gb vram" OR
-                             "16 gb vram" OR "rtx 4080" OR "rtx 4090" OR "rtx
-                             4070 ti super" OR "rx 6800" OR "rx 7800 xt" OR "rx
-                             7900 xt" OR "rx 7900 xtx")"\n\n**Listing
-                             Details:**\n- Title: "GIGABYTE G5 KF Gaming
-                             Notebook 15.6""\n- Price: CA$1,000 (within
-                             range)\n- Description: "GIGABYTE G5 KF Gaming
-                             Notebook 15.6" FHD 144Hz Intel i7-12650H GeForce
-                             RTX 4060 16GB 512GB SSD Windows 11 Home Barely
-                             used. In great condition! No trades please 😊See
-                             translation"\n\n**Analysis:**\n\n1. **Item Type**:
-                             Gaming Notebook ✓ (matches "laptop OR
-                             notebook")\n\n2. **Price**: CA$1,000 is within the
-                             100-1600 range ✓\n   \n3. **GPU Configuration**:
-                             The RTX 4060 with 16GB VRAM falls short of the
-                             specified high-end options. While it meets the
-                             VRAM requirement, it doesn\'t match any of the
-                             explicitly listed GPU models like RTX 4080, RTX
-                             4090, or RX 7900 XTX. This is a significant
-                             deviation from the user\'s specific GPU
-                             preferences.\n\n4. **Keyword Match**: The
-                             description contains "notebook" and "16GB",
-                             satisfying the core search criteria. However, the
-                             absence of specific high-end GPU keywords means it
-                             won\'t fully align with the user\'s detailed
-                             search parameters.\n\n5. **Condition**: The laptop
-                             appears to be in excellent condition, described as
-                             barely used and great. This is a positive
-                             attribute that could make it an attractive option
-                             despite the GPU mismatch.\n\n6. **Overall
-                             Assessment**: The listing meets most fundamental
-                             requirements but lacks the specific high-end GPU
-                             configuration the user was seeking. It\'s a decent
-                             match, though not perfect.\n\nI\'ll rate this as a
-                             3 - Poor match: Some mismatches or missing
-                             details; acceptable but not ideal.\n'
-                                         )
-                                     )
-                                 ],
-                                 created=1776487482,
-                                 model='Huihui-Qwen3.5-4B-Claude-4.6-Opus-ablit
-                             erated.Q6_K.gguf',
-                                 object='chat.completion',
-                                 service_tier=None,
-                                 system_fingerprint='b8672-25eec6f32',
-                                 usage=CompletionUsage(
-                                     completion_tokens=1259,
-                                     prompt_tokens=846,
-                                     total_tokens=2105,
-                                     completion_tokens_details=None,
-                                     prompt_tokens_details=PromptTokensDetails(
-                                         audio_tokens=None,
-                                         cached_tokens=0
-                                     )
-                                 ),
-                                 timings={
-                                     'cache_n': 0,
-                                     'prompt_n': 846,
-                                     'prompt_ms': 1417.735,
-                                     'prompt_per_token_ms': 1.6758096926713948,
-                                     'prompt_per_second': 596.7264686277761,
-                                     'predicted_n': 1259,
-                                     'predicted_ms': 47350.871,
-                                     'predicted_per_token_ms':
-                             37.609905480540114,
-                                     'predicted_per_second': 26.588740046619208
-                                 }
-                             )
-                    INFO     [AI] lmstudio concludes Poor match (3): -     monitor.py:239
-                             Poor match: Some mismatches or missing
-                             details; acceptable but not ideal. The
-                             listing is a gaming laptop with 16GB VRAM in
-                             great condition at a reasonable price, but
-                             the RTX 4060 GPU does not meet the user's
-                             specific requirement for high-end GPUs (RTX
-                             4080/4090 or RX 7800/7900 series). The
-                             keyword criteria is not fully satisfied as it
-                             lacks the required GPU model terms. for
-                             listing GIGABYTE G5 KF Gaming Notebook 15.6".
+                             请按 1 到 5 分打分：
+                             1 -
+                             不匹配：关键信息缺失、类目错误，或存在可疑行为。
+                             2 - 可能匹配：信息不完整，需要进一步确认。
+                             3 - 一般：部分符合，但有明显不符点或缺失。
+                             4 - 较好：大部分符合，信息清晰。
+                             5 - 非常好：高度匹配，且价格或成色优秀。
+                             最后一行必须使用：
+                             "Rating <1-5>: <30字以内建议>"

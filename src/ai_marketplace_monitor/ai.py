@@ -179,32 +179,36 @@ class AIBackend(Generic[TAIConfig]):
         marketplace_config: TMarketplaceConfig,
     ) -> str:
         prompt = (
-            f"""A user wants to buy a {item_config.name} from Facebook Marketplace. """
-            f"""Search phrases: "{'" and "'.join(item_config.search_phrases)}", """
+            f"""用户想在 Facebook Marketplace 购买 {item_config.name}。"""
+            f"""搜索词："{'、'.join(item_config.search_phrases)}"。"""
         )
         if item_config.description:
-            prompt += f"""Description: "{item_config.description}", """
+            prompt += f"""需求描述："{item_config.description}"。"""
         #
         max_price = item_config.max_price or 0
         min_price = item_config.min_price or 0
         if max_price and min_price:
-            prompt += f"""Price range: {min_price} to {max_price}. """
+            prompt += f"""价格范围：{min_price} 到 {max_price}。"""
         elif max_price:
-            prompt += f"""Max price {max_price}. """
+            prompt += f"""最高价：{max_price}。"""
         elif min_price:
-            prompt += f"""Min price {min_price}. """
+            prompt += f"""最低价：{min_price}。"""
         #
         if item_config.antikeywords:
-            prompt += f"""Exclude keywords "{'" and "'.join(item_config.antikeywords)}" in title or description."""
+            prompt += f"""标题或描述中必须排除关键词："{'、'.join(item_config.antikeywords)}"。"""
         if getattr(item_config, "ai_keywords", False) and item_config.keywords:
             keywords_list = item_config.keywords if isinstance(item_config.keywords, list) else [item_config.keywords]
-            prompt += f""" The listing title and description MUST semantically match the following keyword criteria: "{'; '.join(keywords_list)}". If the listing does not match, rate it 1."""
+            prompt += (
+                f""" 标题和描述必须在语义上满足以下关键词条件："{'; '.join(keywords_list)}"。"""
+                """不满足时直接评为 1 分。"""
+            )
         #
         prompt += (
-            f"""\n\nThe user found a listing:  """
+            f"""\n\n用户找到的商品信息："""
             # f"""priced at {listing.price}, located in {listing.location}, """
             # f"""posted at {listing.post_url} with description "{listing.description}"\n\n"""
-            f""" "{listing.description}"\n\n"""
+            f"""标题：{listing.title}；"""
+            f"""描述："{listing.description}"\n\n"""
         )
         # prompt
         if item_config.prompt is not None:
@@ -212,10 +216,7 @@ class AIBackend(Generic[TAIConfig]):
         elif marketplace_config.prompt is not None:
             prompt += marketplace_config.prompt
         else:
-            prompt += (
-                "Evaluate how well this listing matches the user's criteria. Assess the description, MSRP, model year, "
-                "condition, and seller's credibility."
-            )
+            prompt += "请判断该商品与用户需求的匹配度，重点考虑描述、价格合理性、年份、成色和卖家可信度。"
         # extra_prompt
         prompt += "\n"
         if item_config.extra_prompt is not None:
@@ -229,15 +230,14 @@ class AIBackend(Generic[TAIConfig]):
             prompt += f"\n{marketplace_config.rating_prompt.strip()}\n"
         else:
             prompt += (
-                "\nRate from 1 to 5 based on the following: \n"
-                "1 - No match: Missing key details, wrong category/brand, or suspicious activity (e.g., external links).\n"
-                "2 - Potential match: Lacks essential info (e.g., condition, brand, or model); needs clarification.\n"
-                "3 - Poor match: Some mismatches or missing details; acceptable but not ideal.\n"
-                "4 - Good match: Mostly meets criteria with clear, relevant details.\n"
-                "5 - Great deal: Fully matches criteria, with excellent condition or price.\n"
-                "Conclude with:\n"
-                '"Rating <1-5>: <summary>"\n'
-                "where <1-5> is the rating and <summary> is a brief recommendation (max 30 words)."
+                "\n请按 1 到 5 分打分：\n"
+                "1 - 不匹配：关键信息缺失、类目错误，或存在可疑行为。\n"
+                "2 - 可能匹配：信息不完整，需要进一步确认。\n"
+                "3 - 一般：部分符合，但有明显不符点或缺失。\n"
+                "4 - 较好：大部分符合，信息清晰。\n"
+                "5 - 非常好：高度匹配，且价格或成色优秀。\n"
+                "最后一行必须使用：\n"
+                '"Rating <1-5>: <30字以内建议>"'
             )
         if self.logger:
             self.logger.debug(f"""{hilight("[AI-Prompt]", "info")} {prompt}""")
