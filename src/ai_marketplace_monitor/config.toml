@@ -376,7 +376,7 @@ search_phrases = [
 ]
 keywords = '(laptop OR notebook OR desktop OR pc OR computer) AND ("16g vram")'
 ai_keywords = true
-ai = 'lmstudio'
+ai = 'ollama'
 rating = 3
 min_price = 100
 max_price = 1600
@@ -396,7 +396,7 @@ search_phrases = [
 ]
 keywords = 'mac 32G'
 ai_keywords = true
-ai = 'lmstudio'
+ai = 'ollama'
 rating = 3
 antikeywords = ['intel', 'core i5', 'core i7', 'core i9']
 min_price = 100
@@ -414,11 +414,11 @@ Pay special attention to:
 #
 # AI configuration (LM Studio local server)
 #
-[ai.lmstudio]
+[ai.ollama]
 provider = 'ollama'
-base_url = 'http://localhost:1234/v1'
-api_key = 'lm-studio'
-model = 'deepseek-r1:14b'
+base_url = '${AI_BASE_URL}'
+api_key = '${AI_API_KEY}'
+model = '${AI_MODEL}'
 
 #
 # Notifications
