@@ -20,8 +20,8 @@ echo ">>> 同步依赖..."
 uv sync
 
 # 4. 安装 playwright 浏览器（首次或更新后可能需要）
-echo ">>> 确认 playwright 浏览器已安装..."
-uv run playwright install chromium
+# echo ">>> 确认 playwright 浏览器已安装..."
+# uv run playwright install chromium
 
 # 5. Telegram 凭据（config.toml 中的占位符会读取这些环境变量）
 export TELEGRAM_BOT_TOKEN="***"
