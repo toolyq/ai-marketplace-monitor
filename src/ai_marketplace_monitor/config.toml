@@ -422,6 +422,7 @@ Pay special attention to:
 provider = 'ollama'
 base_url = 'http://localhost:1234/v1'
 api_key = 'lm-studio'
+model = 'deepseek-r1:14b'
 
 #
 # Notifications
