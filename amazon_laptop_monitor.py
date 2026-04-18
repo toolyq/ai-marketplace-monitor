@@ -109,7 +109,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--min-price", type=float, default=None, help="Minimum price filter.")
     parser.add_argument("--max-price", type=float, default=None, help="Maximum price filter.")
-    parser.add_argument("--max-pages", type=int, default=1, help="How many pages to crawl.")
+    parser.add_argument("--max-pages", type=int, default=3, help="How many pages to crawl.")
     parser.add_argument("--headful", action="store_true", help="Run browser in non-headless mode.")
     parser.add_argument(
         "--cdp-url",
