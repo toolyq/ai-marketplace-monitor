@@ -1,40 +1,43 @@
-[AI-Prompt] 用户想在 Facebook Marketplace 购买     ai.py:243
+DEBUG    [AI-Prompt] 用户想在 Facebook Marketplace 购买     ai.py:243
                              gpu16_pc。搜索词："gaming laptop PC AI
                              desktop、gaming laptop PC AI
                              desktop"。需求描述："Gaming laptop or desktop PC
                              with at least 16GB VRAM, powered by a high-end GPU
                              such as RTX 4080, RTX 4090, RTX 4070 Ti Super, RX
-                             6800, RX 7800 XT, RX 7900 XT, or RX 7900 XTX."。
+                             6800, RX 7800 XT, RX 7900 XT, or RX 7900
+                             XTX."。价格范围：100 到 1600。
                              标题和描述必须在语义上满足以下关键词条件："(laptop
                              OR notebook OR desktop OR pc OR computer) AND
                              ("16g vram")"。不满足时直接评为 1 分。
 
-                             用户找到的商品信息：标题：Dell ALIENWARE AURORA
-                             R12 GAMING Desktop (brand
-                             new)；价格：CA$799；成色：New；链接：https://www.f
-                             acebook.com/marketplace/item/1358266689682879/?ref
-                             =search&referral_code=null&referral_story_type=pos
-                             t&tracking=browse_serp%3Ad891f277-d6b1-4d1f-8c9b-1
-                             cc01be6129e&__tn__=!%3AD。描述："This is brand new
-                             pc in sealed Retail box, Dell ONE YEAR warranty.
-                             E-mail:
-                             Computer store : 770 danforth ave. M4J 1L5
-                             Our business hours are Monday to Friday, 10 am. to
-                             7pm, Saturday 10 am. to 6 pm
+                             用户找到的商品信息：标题：Gaming PC；描述："🔥
+                             Gaming PC for Sale – Great Performance 🔥
 
-                             Dell ALIENWARE AURORA R12 GAMING Desktop (brand
-                             new)
-                             Intel Core i7-11700F CPU
-                             Nvidia RTX 2060 6GB GPU
-                             16GB, 3200MHz DDR4 Ram
-                             256GB M.2 PCIe NVMe SSD + 1TB 7200 SATA HDD
-                             1000W PSU, Liquid Cooled system
-                             Dell Wireless DW1810 (1x1) 802 .11ac , Bluetooth
-                             5.0
-                             Windows 11 64bit English
+                             Selling a solid gaming PC that runs modern games
+                             smoothly and is perfect for gaming, school, or
+                             everyday use.
 
-                             (up to 512GB NVMe SSD +$80)
-                             (up to RTX 3080 10GB +$450)See translation"
+                             💻 Specs:
+
+                             Ryzen 5 5700 Processor
+
+                             RTX 3050 Graphics Card
+
+                             16GB RAM
+
+                             1TB Storage
+
+                             🎮 Performance:
+
+                             Runs games like Fortnite, Warzone, GTA V,
+                             Valorant, etc.
+
+                             Smooth FPS on medium to high settings
+
+                             ⚡ Fast, reliable, and ready to use🧼 Clean and
+                             well maintained
+
+                             📍 TorontoSee translation"
 
                              请判断该商品与用户需求的匹配度，重点考虑描述、价格
                              合理性、年份、成色和卖家可信度。
@@ -62,3 +65,4 @@
                              5 - 非常好：高度匹配，且价格或成色优秀。
                              最后一行必须使用：
                              "Rating <1-5>: <30字以内建议>"
+                    INFO     [AI] lmstudio connected.                           ai.py:276
