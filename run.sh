@@ -16,8 +16,8 @@ if ! command -v uv &>/dev/null; then
 fi
 
 # 3. 同步依赖
-echo ">>> 同步依赖..."
-uv sync
+# echo ">>> 同步依赖..."
+# uv sync
 
 # 4. 安装 playwright 浏览器（首次或更新后可能需要）
 # echo ">>> 确认 playwright 浏览器已安装..."

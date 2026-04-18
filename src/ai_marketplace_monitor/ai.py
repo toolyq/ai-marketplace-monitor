@@ -196,12 +196,12 @@ class AIBackend(Generic[TAIConfig]):
         #
         if item_config.antikeywords:
             prompt += f"""标题或描述中必须排除关键词："{'、'.join(item_config.antikeywords)}"。"""
-        if getattr(item_config, "ai_keywords", False) and item_config.keywords:
-            keywords_list = item_config.keywords if isinstance(item_config.keywords, list) else [item_config.keywords]
-            prompt += (
-                f""" 标题和描述必须在语义上满足以下关键词条件："{'; '.join(keywords_list)}"。"""
-                """不满足时直接评为 1 分。"""
-            )
+        # if getattr(item_config, "ai_keywords", False) and item_config.keywords:
+        #     keywords_list = item_config.keywords if isinstance(item_config.keywords, list) else [item_config.keywords]
+        #     prompt += (
+        #         f""" 标题和描述必须在语义上满足以下关键词条件："{'; '.join(keywords_list)}"。"""
+        #         """不满足时直接评为 1 分。"""
+        #     )
         #
         prompt += (
             f"""\n\n用户找到的商品信息："""
