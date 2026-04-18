@@ -31,6 +31,7 @@ class MarketItemCommonConfig(BaseConfig):
     """
 
     ai: List[str] | None = None
+    ai_keywords: bool = False
     exclude_sellers: List[str] | None = None
     notify: List[str] | None = None
     search_city: List[str] | None = None
@@ -57,6 +58,10 @@ class MarketItemCommonConfig(BaseConfig):
             self.ai = [self.ai]
         if not all(isinstance(x, str) for x in self.ai):
             raise ValueError(f"Item {hilight(self.name)} ai must be a string or list.")
+
+    def handle_ai_keywords(self: "MarketItemCommonConfig") -> None:
+        if not isinstance(self.ai_keywords, bool):
+            raise ValueError(f"Item {hilight(self.name)} ai_keywords must be a boolean.")
 
     def handle_exclude_sellers(self: "MarketItemCommonConfig") -> None:
         if self.exclude_sellers is None:

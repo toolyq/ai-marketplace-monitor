@@ -377,8 +377,19 @@ search_phrases = [
     'workstation pc',
 ]
 keywords = '(laptop OR notebook OR desktop OR pc OR computer) AND ("16gb vram" OR "16 gb vram" OR "rtx 4080" OR "rtx 4090" OR "rtx 4070 ti super" OR "rx 6800" OR "rx 7800 xt" OR "rx 7900 xt" OR "rx 7900 xtx")'
+ai_keywords = true
+ai = 'lmstudio'
+rating = 3
 min_price = 100
 max_price = 1600
+description = 'Gaming laptop or desktop PC with at least 16GB VRAM, powered by a high-end GPU such as RTX 4080, RTX 4090, RTX 4070 Ti Super, RX 6800, RX 7800 XT, RX 7900 XT, or RX 7900 XTX.'
+extra_prompt = '''
+Pay special attention to:
+- The GPU model must be one of: RTX 4080, RTX 4090, RTX 4070 Ti Super, RX 6800, RX 7800 XT, RX 7900 XT, RX 7900 XTX (or equivalent with 16GB+ VRAM).
+- If the GPU model is not clearly stated or is a lesser model, rate it 1 or 2.
+- Laptops are acceptable as long as the GPU meets the requirement.
+- Bundles (e.g., with monitor or peripherals) are fine.
+'''
 
 [item.mac_32gb_ram]
 search_phrases = [
@@ -388,10 +399,29 @@ search_phrases = [
     'imac',
 ]
 keywords = '(mac OR macbook OR imac OR "mac mini" OR "mac studio") AND ("apple silicon" OR m1 OR m1pro OR "m1 pro" OR m1max OR "m1 max" OR m1ultra OR "m1 ultra" OR m2 OR m2pro OR "m2 pro" OR m2max OR "m2 max" OR m2ultra OR "m2 ultra" OR m3 OR m3pro OR "m3 pro" OR m3max OR "m3 max" OR m4 OR m4pro OR "m4 pro" OR m4max OR "m4 max") AND ("unified memory" OR "shared memory" OR "32gb" OR "32 gb" OR "36gb" OR "36 gb" OR "48gb" OR "48 gb" OR "64gb" OR "64 gb" OR "96gb" OR "96 gb" OR "128gb" OR "128 gb")'
+ai_keywords = true
+ai = 'lmstudio'
+rating = 3
 antikeywords = ['intel', 'core i5', 'core i7', 'core i9']
 min_price = 100
 max_price = 1600
+description = 'Apple Mac computer (MacBook Pro, Mac Studio, Mac Mini, or iMac) with Apple Silicon chip (M1/M2/M3/M4 series) and at least 32GB unified memory.'
+extra_prompt = '''
+Pay special attention to:
+- Must be Apple Silicon (M1, M2, M3, or M4 series). Intel Macs are not acceptable.
+- Unified memory must be at least 32GB (32GB, 36GB, 48GB, 64GB, 96GB, or 128GB).
+- If the memory size is not clearly mentioned, or is only 8GB or 16GB, rate it 1 or 2.
+- Pro/Max/Ultra chip variants are preferred as they typically come with more memory.
+'''
 
+
+#
+# AI configuration (LM Studio local server)
+#
+[ai.lmstudio]
+provider = 'ollama'
+base_url = 'http://localhost:1234/v1'
+api_key = 'lm-studio'
 
 #
 # Notifications

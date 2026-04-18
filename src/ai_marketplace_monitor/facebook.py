@@ -631,7 +631,7 @@ class FacebookMarketplace(Marketplace):
     ) -> bool:
         # get antikeywords from both item_config or config
         antikeywords = item_config.antikeywords
-        if antikeywords and (
+        if not item_config.ai_keywords and antikeywords and (
             is_substring(antikeywords, item.title + " " + item.description, logger=self.logger)
         ):
             if self.logger:
@@ -643,7 +643,8 @@ class FacebookMarketplace(Marketplace):
         # if the return description does not contain any of the search keywords
         keywords = item_config.keywords
         if (
-            description_available
+            not item_config.ai_keywords
+            and description_available
             and keywords
             and not (
                 is_substring(keywords, item.title + "  " + item.description, logger=self.logger)

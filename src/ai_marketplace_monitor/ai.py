@@ -196,6 +196,9 @@ class AIBackend(Generic[TAIConfig]):
         #
         if item_config.antikeywords:
             prompt += f"""Exclude keywords "{'" and "'.join(item_config.antikeywords)}" in title or description."""
+        if getattr(item_config, "ai_keywords", False) and item_config.keywords:
+            keywords_list = item_config.keywords if isinstance(item_config.keywords, list) else [item_config.keywords]
+            prompt += f""" The listing title and description MUST semantically match the following keyword criteria: "{'; '.join(keywords_list)}". If the listing does not match, rate it 1."""
         #
         prompt += (
             f"""\n\nThe user found a listing titled "{listing.title}" in {listing.condition} condition, """
