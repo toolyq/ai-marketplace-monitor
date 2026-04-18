@@ -679,7 +679,7 @@ class FacebookMarketplace(Marketplace):
 
 
 class FacebookSearchResultPage(WebPage):
-    max_listings = 13
+    max_listings = 100
 
     def _count_listing_elements(self: "FacebookSearchResultPage") -> int:
         return len(
