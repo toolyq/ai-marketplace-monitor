@@ -508,6 +508,8 @@ class Marketplace(Generic[TMarketplaceConfig, TItemConfig]):
             #   https://github.com/microsoft/playwright-python/issues/1170
             # for details.
             # self.browser.close()
+            if self.page is not None:
+                self.page.close()
             self.browser = None
             self.page = None
 

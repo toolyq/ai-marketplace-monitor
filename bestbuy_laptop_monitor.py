@@ -459,10 +459,16 @@ def run_once(args: argparse.Namespace) -> int:
     with sync_playwright() as p:
         if args.cdp_url:
             browser = p.chromium.connect_over_cdp(args.cdp_url, timeout=args.cdp_timeout)
-            context = browser.contexts[0] if browser.contexts else browser.new_context()
+            if browser.contexts:
+                context = browser.contexts[0]
+                own_context = False
+            else:
+                context = browser.new_context()
+                own_context = True
         else:
             browser = p.chromium.launch(headless=not args.headful)
             context = browser.new_context()
+            own_context = True
         page = context.new_page()
 
         for page_num in range(1, args.max_pages + 1):
@@ -521,7 +527,9 @@ def run_once(args: argparse.Namespace) -> int:
                 all_candidates.append(product)
             print(f"  -> Skipped: {skipped}  |  Matched so far: {len(all_candidates)}")
 
-        context.close()
+        page.close()
+        if own_context:
+            context.close()
         browser.close()
 
     if not all_candidates:
