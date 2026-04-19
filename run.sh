@@ -27,6 +27,15 @@ fi
 export TELEGRAM_BOT_TOKEN="***"
 export TELEGRAM_CHAT_ID="***"
 
-# 6. 运行监控程序
+# 6. 检查并重启 Chromium（远程调试模式）
+if pgrep -x "chromium" &>/dev/null; then
+    echo ">>> 检测到 Chromium 进程，正在终止..."
+    pkill -x "chromium"
+    sleep 1
+fi
+echo ">>> 启动 Chromium（远程调试模式）..."
+chromium --remote-debugging-port=9222 --remote-allow-origins=* --enable-features=WebUIDarkMode &
+
+# 8. 运行监控程序
 echo ">>> 启动监控..."
 uv run python monitor.py -v "$@"
